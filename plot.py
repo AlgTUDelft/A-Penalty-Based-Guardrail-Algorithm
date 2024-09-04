@@ -20,7 +20,7 @@ def objective_value(num_con, T, opt_name, path, freq_s):
             data = data.iloc[::freq_elem, :]
         opts[opt] = data
     # objective function
-    plt.figure(figsize=(20, 5))
+    #plt.figure(figsize=(10, 5))
     for opt in opt_name:
         plt.plot(
             opts[opt]["runtime"],
@@ -34,17 +34,18 @@ def objective_value(num_con, T, opt_name, path, freq_s):
         if opt in ["mps", "pm_lb", "pm_ub"]:
             plt.axhline(
                 y=opts[opt]["J"][0],
-                xmin=opts[opt]["runtime"][0] / (T-2),
+                xmin=opts[opt]["runtime"][0] / (T),
                 xmax=1,
                 color=visualization_spec[opt]["color"],
                 linestyle=visualization_spec[opt]["linestyle"], )
-    plt.xlim([-2, T])
+    plt.xlim([0, T])
     # plt.ylim([lower_bound, upper_bound])
     plt.yscale("log")
     plt.legend()
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Objective value", fontsize=14)
     plt.grid()
+    plt.savefig("objective_value.svg", format='svg')
     plt.show()
 
 
@@ -60,7 +61,7 @@ def constraint_violation(num_con, T, opt_name, path, freq_s):
         for i in range(len(f)):
             opts[opt]["f"].append(abs(min(0, min(f[i]))))
     # objective function
-    plt.figure(figsize=(20, 5))
+    # plt.figure(figsize=(10, 5))
     for opt in opt_name:
         plt.plot(
             opts[opt]["runtime"],
@@ -74,17 +75,18 @@ def constraint_violation(num_con, T, opt_name, path, freq_s):
         if opt in ["mps", "pm_lb", "pm_ub"]:
             plt.axhline(
                 y=opts[opt]["f"][0],
-                xmin=opts[opt]["runtime"][0] / (T-2),
+                xmin=opts[opt]["runtime"][0] / (T),
                 xmax=1,
                 color=visualization_spec[opt]["color"],
                 linestyle=visualization_spec[opt]["linestyle"], )
-    plt.xlim([-2, T])
+    plt.xlim([0, T])
     # plt.yscale("log")
     # plt.ylim([lower_bound, upper_bound])
     plt.legend()
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Constraint violation", fontsize=14)
     plt.grid()
+    plt.savefig("constraint_violations.svg", format='svg')
     plt.show()
 
 

@@ -135,6 +135,51 @@ def standard_penalty_alg(num_var, num_con, c, q, ub, lb, C, initial_vector, delt
     return [J], [constraint_values], var, [runtime]
 
 
+def ipdd(
+        num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, rho, delta, patience, grad_iter_max,
+):
+    Js, constraint_values, solutions, runtimes = [], [], [], [0]
+    solution = initial_vector
+    lambdas = np.array(initial_lambdas, dtype="float32")
+    outer_iter = 0
+    while runtimes[-1] < T:
+        outer_iter += 1
+        # at each new iteration of outer loop, reset gradient iterations and patience counter.
+        grad_iter, grad_patience_iter = 0, 0
+        solution = tf.Variable(np.array(solution).reshape(1, -1), dtype=tf.float32)
+        opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+        grads_prev = tf.convert_to_tensor(
+            np.array([100] * num_con, dtype=np.float32).reshape(1, num_con))
+        start_time = time.time()
+        while grad_patience_iter < patience and grad_iter < grad_iter_max:
+            grads = calculate_gradient_lagrangian_fun(var=solution, num_var=num_var, num_con=num_con, c=c, q=q,
+                                                      rho=rho, lambdas=lambdas)
+            delta_tf = tf.abs(grads_prev - grads)
+            # if change in gradient is less than parameter delta, increase patience by one.
+            # however, if it is greater than delta, reset patience
+            if tf.reduce_any(delta_tf < delta, 1):
+                grad_patience_iter += 1
+            else:
+                grad_patience_iter = 0
+            grads_prev = grads
+            zipped = zip([grads], [solution])
+            opt.apply_gradients(zipped)
+            grad_iter += 1
+        solution = list(np.array(solution[0]))
+        solution = [lb[i] if x < lb[i] else ub[i] if x > ub[i] else x for i, x in enumerate(solution)]
+        J = sum(c[-1][i] * solution[i] for i in range(num_var))
+        constraint_value = get_constraint_values(var=solution, num_var=num_var, num_con=num_con, c=c, q=q)
+        for i in range(num_con):
+            lambdas[i] = lambdas[i] + (1 / rho) * constraint_value[i]
+        rho = rho * (1 / (outer_iter ** (1 / 3)))
+        end_time = time.time()
+        solutions.append(solution)
+        Js.append(J)
+        constraint_values.append(constraint_value)
+        runtimes.append(runtimes[-1] + end_time - start_time)
+    return Js, constraint_values, solutions, runtimes[1:]
+
+
 def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, step_size, perturbation_term, beta, gamma):
     Js, constraint_values, solutions, runtimes = [], [], [], [0]
     solution_prev = initial_vector
@@ -220,7 +265,7 @@ def pga(num_var, num_con, c, q, ub, lb, T, C, initial_vector, delta, patience, g
 
 if __name__ == "__main__":
     path: Path = Path("data/fun_1")
-    mps_dict, pm_lb_dict, pm_ub_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}
+    mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
     problem_spec = {
         "num_con": 2,  # number of constraints
         "num_var": 2,  # number of variables
@@ -230,7 +275,8 @@ if __name__ == "__main__":
     }
     problem_spec["ub"] = [float("inf")] * problem_spec["num_var"]
     problem_spec["lb"] = [0] * problem_spec["num_var"]
-    grad_spec = {"initial_vector": [20, 20], "patience": 50, "delta": 0.000001, "grad_iter_max": 25000}
+    grad_spec = {"initial_vector": [20, 20], "initial_lambdas": [0, 0], "patience": 50, "delta": 0.000001,
+                 "grad_iter_max": 25000}
     """
     var, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
                                                          num_con=problem_spec["num_con"], c=problem_spec["c"],
@@ -275,7 +321,6 @@ if __name__ == "__main__":
                                                              perturbation_term=0.9,
                                                              beta=0.9, gamma=1)
     save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, name="gdpa")
-    """
     J_pga, constraint_values_pga, var, runtime_pga = pga(num_var=problem_spec["num_var"],
                                                          num_con=problem_spec["num_con"],
                                                          c=problem_spec["c"],
@@ -286,3 +331,17 @@ if __name__ == "__main__":
                                                          patience=grad_spec["patience"],
                                                          grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, name="pga")
+    """
+    J_ipdd, constraint_values_ipdd, var, runtime_ipdd = ipdd(
+        num_var=problem_spec["num_var"],
+        num_con=problem_spec["num_con"],
+        c=problem_spec["c"],
+        q=problem_spec["q"], ub=problem_spec["ub"],
+        lb=problem_spec["lb"], T=problem_spec["T"],
+        rho=1,
+        initial_vector=grad_spec["initial_vector"],
+        initial_lambdas=grad_spec["initial_lambdas"],
+        delta=grad_spec["delta"],
+        patience=grad_spec["patience"],
+        grad_iter_max=grad_spec["grad_iter_max"])
+    save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, name="ipdd")

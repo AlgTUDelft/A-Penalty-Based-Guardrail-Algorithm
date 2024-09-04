@@ -3,6 +3,19 @@ import tensorflow as tf
 
 
 @tf.function
+def calculate_gradient_lagrangian_fun(var, num_var, num_con, c, q, rho, lambdas):
+    with tf.GradientTape() as tape:
+        tape.watch(var)
+        f = tf.math.add_n([c[-1][i] * var[:, i] for i in range(num_var)])
+        for i in range(num_con):
+            f = tf.math.add(f, (1/rho)* (
+                tf.math.maximum(float(0), (tf.math.add_n([c[i][j] * var[:, j] for j in range(num_var)]) - q[i]) ** 2)))
+            f = tf.math.add(f, float(lambdas[i]) * (tf.math.add_n([c[i][j] * var[:, j] for j in range(num_var)]) - q[i]))
+    grads = tape.gradient(f, var)
+    return grads
+
+
+@tf.function
 def calculate_gradient_penalty_fun(var, num_var, num_con, c, q, C):
     with tf.GradientTape() as tape:
         tape.watch(var)
