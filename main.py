@@ -353,6 +353,7 @@ if __name__ == "__main__":
                                                          q=problem_spec["q"],
                                                          ub=problem_spec["ub"], lb=problem_spec["lb"])
     save(dict_=mps_dict, J=J_mps, f=constraint_values_mps, runtime=runtime_mps, path="data/fun_1/", name="mps")
+    """
     J_pm_lb, constraint_values_pm_lb, var, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
                                                                                 num_con=problem_spec["num_con"],
                                                                                 c=problem_spec["c"],
@@ -416,4 +417,6 @@ if __name__ == "__main__":
                                                          patience=grad_spec["patience"],
                                                          grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path="data/fun_1/", name="pga")
-    #initialization(problem_spec, grad_spec, initial_vectors=[[50,50],[15,15],[10,10]], N_init=3, path="data/fun_1/initialization/")
+    """
+    initialization(problem_spec, grad_spec, initial_vectors=[[50, 50], [15, 15], [10, 10]], N_init=3,
+                   path="data/fun_1/initialization/")
