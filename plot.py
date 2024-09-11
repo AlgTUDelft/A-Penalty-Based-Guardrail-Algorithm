@@ -36,21 +36,21 @@ visualization_spec = {
 visualization_spec_init = {
     "mps": {"color": "#36FF33", "marker": "s", "linestyle": "solid", "label": r"$MPS(\mathbf{x}^0_{max})$",
             "markersize": 12},
-    "pm_lb_init_50_50": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
+    "pm_lb_init_25_25": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
                          "label": r"$PM_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 12},
-    "pm_ub_init_50_50": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
+    "pm_ub_init_25_25": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
                          "label": r"$PM_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 12},
-    "ipdd_init_50_50": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
+    "ipdd_init_25_25": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
                         "label": r"$IPDD(\mathbf{x}^0_{max})$",
                         "markersize": 15},
-    "gdpa_init_50_50": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
+    "gdpa_init_25_25": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
                         "label": r"$GDPA(\mathbf{x}^0_{max})$",
                         "markersize": 10},
     "gdpa_init_20_20": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
                         "label": r"$GDPA(\mathbf{x}^0_1)$", "markersize": 6},
     "gdpa_init_10_10": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
                         "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
-    "pga_init_50_50": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
+    "pga_init_25_25": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
                        "label": r"$PGA(\mathbf{x}^0_{max})$",
                        "markersize": 10},
     "pga_init_20_20": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
@@ -146,6 +146,21 @@ def form_optimizers_init_names(opt_names, opt_names_init, initializations):
     return opt_names_init
 
 
+def get_element_end_iteration(opt_name, path, initial_solutions):
+    """
+    Print the objective function value and maximum constraint violation in the last iteration.
+    :param opt_name: str
+    :param path: Path
+    :param initial_solutions: list
+    :return: None
+    """
+    for initial_vector in initial_solutions:
+        suffix = '_'.join(map(str, initial_vector))
+        data = pd.read_json(path.joinpath(opt_name + "_init_" + suffix + ".json"))
+        print("Objective function value ", data["J"].tolist()[-1])
+        print("Constraint violation ", abs(min(0, max(data["f"].tolist()[-1], key=abs))))
+
+
 def objective_value_initialization(num_con, T, opt_name, path, freq_s):
     opts = {}
     for opt in opt_name:
@@ -180,7 +195,7 @@ def objective_value_initialization(num_con, T, opt_name, path, freq_s):
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Objective value", fontsize=14)
     plt.grid()
-    plt.savefig(Path("plots/fun_1/initialization").joinpath("objective_value.svg"), format='svg')
+    plt.savefig(Path("plots/fun_1/initialization").joinpath("objective_value_init.svg"), format='svg')
     plt.show()
 
 
@@ -221,22 +236,26 @@ def constraint_violation_initialization(num_con, T, opt_name, path, freq_s):
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Constraint violation", fontsize=14)
     plt.grid()
-    plt.savefig(Path("plots/fun_1/initialization").joinpath("constraint_violations.svg"), format='svg')
+    plt.savefig(Path("plots/fun_1/initialization").joinpath("constraint_violations_init.svg"), format='svg')
     plt.show()
 
 
 if __name__ == "__main__":
-    objective_value(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=Path("data/fun_1"),
+    """
+    objective_value(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=Path("data/fun_1.txt"),
                     freq_s=10)
-    constraint_violation(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=Path("data/fun_1"),
+    constraint_violation(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=Path("data/fun_1.txt"),
                          freq_s=10)
     opt_names_init = form_optimizers_init_names(opt_names=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
-                                                opt_names_init=["mps", "pm_lb_init_50_50", "pm_ub_init_50_50",
-                                                                "ipdd_init_50_50"],
-                                                initializations=[[50, 50], [20, 20], [10, 10]])
+                                                opt_names_init=["mps", "pm_lb_init_25_25", "pm_ub_init_25_25",
+                                                                "ipdd_init_25_25"],
+                                                initializations=[[25, 25], [20, 20], [10, 10]])
     objective_value_initialization(2, 200, opt_name=opt_names_init,
-                                   path=Path("data/fun_1/initialization"),
+                                   path=Path("data/fun_1.txt/initialization"),
                                    freq_s=10)
     constraint_violation_initialization(2, 200, opt_name=opt_names_init,
-                                        path=Path("data/fun_1/initialization"),
+                                        path=Path("data/fun_1.txt/initialization"),
                                         freq_s=10)
+    """
+    get_last_element(opt_name="gdpa", path=Path("data/fun_1/initialization"),
+                     initial_solutions=[[50, 50], [25, 25], [20, 20], [10, 10]])

@@ -16,7 +16,7 @@ def save(dict_, J, f, runtime, path, name):
     dict_["f"] = f
     dict_["runtime"] = runtime
     df = pd.DataFrame(dict_)
-    df.to_json(path + name + ".json")
+    df.to_json(path.joinpath(name + ".json"))
 
 
 def get_constraint_values(var, num_var, num_con, c, q, c_fac=1, q_fac=1):
@@ -190,6 +190,8 @@ def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, ste
         outer_iter += 1
         start_time = time.time()
         solution_prev_tf = tf.Variable(solution_prev.reshape(1, -1), dtype=tf.float32)
+        if np.isnan(solution_prev).any():
+            break
         # first equation
         # np.ndarray([dJ/dx_1, dJ/dx_2,...,dJ/dx_n])_1xn
         delta_J = np.array(calculate_gradient_obj_fun(var=solution_prev_tf, num_var=num_var, c=c))[0]
@@ -335,25 +337,25 @@ def initialization(problem_spec, grad_spec, initial_vectors, N_init, path):
 
 
 if __name__ == "__main__":
-    path: Path = Path("data/fun_1")
+    path: Path = Path("data/fun_2")
     mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
     problem_spec = {
         "num_con": 2,  # number of constraints
         "num_var": 2,  # number of variables
-        "c": [[1, 0], [1, 2], [1, 10]],  # coefficients of constraints (the last constraint refers t objective function)
-        "q": [1, 5],  # right-hand side of constraints
+        "c": [[1, 2], [1, 0], [1, 10]],  # coefficients of constraints (the last constraint refers t objective function)
+        "q": [5, 1],  # right-hand side of constraints
         "T": 200  # time limit
     }
     problem_spec["ub"] = [float("inf")] * problem_spec["num_var"]
     problem_spec["lb"] = [0] * problem_spec["num_var"]
-    grad_spec = {"initial_vector": [50, 50], "initial_lambdas": [0, 0], "patience": 50, "delta": 0.000001,
+    grad_spec = {"initial_vector": [25, 25], "initial_lambdas": [0, 0], "patience": 50, "delta": 0.000001,
                  "grad_iter_max": 25000}
+    """
     var, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
                                                          num_con=problem_spec["num_con"], c=problem_spec["c"],
                                                          q=problem_spec["q"],
                                                          ub=problem_spec["ub"], lb=problem_spec["lb"])
-    save(dict_=mps_dict, J=J_mps, f=constraint_values_mps, runtime=runtime_mps, path="data/fun_1/", name="mps")
-    """
+    save(dict_=mps_dict, J=J_mps, f=constraint_values_mps, runtime=runtime_mps, path=path, name="mps")
     J_pm_lb, constraint_values_pm_lb, var, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
                                                                                 num_con=problem_spec["num_con"],
                                                                                 c=problem_spec["c"],
@@ -366,7 +368,7 @@ if __name__ == "__main__":
                                                                                 patience=grad_spec["patience"],
                                                                                 grad_iter_max=grad_spec[
                                                                                     "grad_iter_max"])
-    save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path="data/fun_1/",
+    save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path=path,
          name="pm_lb")
     J_pm_ub, constraint_values_pm_ub, var, runtime_pm_ub = standard_penalty_alg(num_var=problem_spec["num_var"],
                                                                                 num_con=problem_spec["num_con"],
@@ -380,7 +382,7 @@ if __name__ == "__main__":
                                                                                 patience=grad_spec["patience"],
                                                                                 grad_iter_max=grad_spec[
                                                                                     "grad_iter_max"])
-    save(dict_=pm_ub_dict, J=J_pm_ub, f=constraint_values_pm_ub, runtime=runtime_pm_ub, path="data/fun_1/",
+    save(dict_=pm_ub_dict, J=J_pm_ub, f=constraint_values_pm_ub, runtime=runtime_pm_ub, path=path,
          name="pm_ub")
     J_ipdd, constraint_values_ipdd, var, runtime_ipdd = ipdd(
         num_var=problem_spec["num_var"],
@@ -394,7 +396,7 @@ if __name__ == "__main__":
         delta=grad_spec["delta"],
         patience=grad_spec["patience"],
         grad_iter_max=grad_spec["grad_iter_max"])
-    save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path="data/fun_1/", name="ipdd")
+    save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path=path, name="ipdd")
     J_gdpa, constraint_values_gdpa, var, runtime_gdpa = gdpa(num_var=problem_spec["num_var"],
                                                              num_con=problem_spec["num_con"],
                                                              c=problem_spec["c"], q=problem_spec["q"],
@@ -406,7 +408,7 @@ if __name__ == "__main__":
                                                              step_size=1,
                                                              perturbation_term=0.9,
                                                              beta=0.9, gamma=1)
-    save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path="data/fun_1/", name="gdpa")
+    save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path, name="gdpa")
     J_pga, constraint_values_pga, var, runtime_pga = pga(num_var=problem_spec["num_var"],
                                                          num_con=problem_spec["num_con"],
                                                          c=problem_spec["c"],
@@ -416,7 +418,7 @@ if __name__ == "__main__":
                                                          delta=grad_spec["delta"],
                                                          patience=grad_spec["patience"],
                                                          grad_iter_max=grad_spec["grad_iter_max"])
-    save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path="data/fun_1/", name="pga")
+    save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga")
     """
-    initialization(problem_spec, grad_spec, initial_vectors=[[50, 50], [15, 15], [10, 10]], N_init=3,
-                   path="data/fun_1/initialization/")
+    initialization(problem_spec, grad_spec, initial_vectors=[[25, 25], [20, 20], [10, 10]], N_init=3,
+                   path=path.joinpath("initialization"))
