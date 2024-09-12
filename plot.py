@@ -59,7 +59,7 @@ visualization_spec_init = {
                        "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
 
 
-def objective_value(num_con, T, opt_name, path, freq_s):
+def objective_value(num_con, T, opt_name, path, path_w, freq_s):
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(opt + ".json"))
@@ -93,11 +93,11 @@ def objective_value(num_con, T, opt_name, path, freq_s):
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Objective value", fontsize=14)
     plt.grid()
-    plt.savefig(Path("plots/fun_1/").joinpath("objective_value.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value.svg"), format='svg')
     plt.show()
 
 
-def constraint_violation(num_con, T, opt_name, path, freq_s):
+def constraint_violation(num_con, T, opt_name, path, path_w, freq_s):
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(f"{opt}.json"))[["f", "runtime"]]
@@ -134,7 +134,7 @@ def constraint_violation(num_con, T, opt_name, path, freq_s):
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Constraint violation", fontsize=14)
     plt.grid()
-    plt.savefig(Path("plots/fun_1/").joinpath("constraint_violations.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations.svg"), format='svg')
     plt.show()
 
 
@@ -161,7 +161,7 @@ def get_element_end_iteration(opt_name, path, initial_solutions):
         print("Constraint violation ", abs(min(0, max(data["f"].tolist()[-1], key=abs))))
 
 
-def objective_value_initialization(num_con, T, opt_name, path, freq_s):
+def objective_value_initialization(num_con, T, opt_name, path, path_w, freq_s):
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(opt + ".json"))
@@ -195,11 +195,11 @@ def objective_value_initialization(num_con, T, opt_name, path, freq_s):
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Objective value", fontsize=14)
     plt.grid()
-    plt.savefig(Path("plots/fun_1/initialization").joinpath("objective_value_init.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_init.svg"), format='svg')
     plt.show()
 
 
-def constraint_violation_initialization(num_con, T, opt_name, path, freq_s):
+def constraint_violation_initialization(num_con, T, opt_name, path, path_w, freq_s):
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(f"{opt}.json"))[["f", "runtime"]]
@@ -236,26 +236,28 @@ def constraint_violation_initialization(num_con, T, opt_name, path, freq_s):
     plt.xlabel("Computational time [s]", fontsize=14)
     plt.ylabel("Constraint violation", fontsize=14)
     plt.grid()
-    plt.savefig(Path("plots/fun_1/initialization").joinpath("constraint_violations_init.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_init.svg"), format='svg')
     plt.show()
 
 
 if __name__ == "__main__":
-    """
-    objective_value(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=Path("data/fun_1.txt"),
+    path_read: Path = Path("data/fun_2")
+    path_write: Path = Path("plots/fun_2")
+    objective_value(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=path_read,
+                    path_w=path_write,
                     freq_s=10)
-    constraint_violation(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=Path("data/fun_1.txt"),
+    constraint_violation(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=path_read,
+                         path_w=path_write,
                          freq_s=10)
     opt_names_init = form_optimizers_init_names(opt_names=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
                                                 opt_names_init=["mps", "pm_lb_init_25_25", "pm_ub_init_25_25",
                                                                 "ipdd_init_25_25"],
                                                 initializations=[[25, 25], [20, 20], [10, 10]])
     objective_value_initialization(2, 200, opt_name=opt_names_init,
-                                   path=Path("data/fun_1.txt/initialization"),
+                                   path=path_read.joinpath("initialization"), path_w=path_write,
                                    freq_s=10)
     constraint_violation_initialization(2, 200, opt_name=opt_names_init,
-                                        path=Path("data/fun_1.txt/initialization"),
+                                        path=path_read.joinpath("initialization"), path_w=path_write,
                                         freq_s=10)
-    """
-    get_last_element(opt_name="gdpa", path=Path("data/fun_1/initialization"),
-                     initial_solutions=[[50, 50], [25, 25], [20, 20], [10, 10]])
+    # get_element_end_iteration(opt_name="gdpa", path=path.joinpath("initialization"),
+    #                          initial_solutions=[[50, 50], [25, 25], [20, 20], [10, 10]])

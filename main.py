@@ -9,12 +9,15 @@ from collections import defaultdict
 from pathlib import Path
 from random import randint
 from tf_functions import *
+from optimization_specs import *
 
 
-def save(dict_, J, f, runtime, path, name):
+def save(dict_, J, f, runtime, path, name, vars=[]):
     dict_["J"] = J
     dict_["f"] = f
     dict_["runtime"] = runtime
+    if vars:
+        dict_["vars"] = vars
     df = pd.DataFrame(dict_)
     df.to_json(path.joinpath(name + ".json"))
 
@@ -112,6 +115,8 @@ def standard_penalty_alg(num_var, num_con, c, q, ub, lb, C, initial_vector, delt
     grads_prev = tf.convert_to_tensor(
         np.array([100] * num_con, dtype=np.float32).reshape(1, num_con)
     )
+    lb = tf.constant(lb, dtype=tf.float32)
+    ub = tf.constant(ub, dtype=tf.float32)
     start_time = time.time()
     while grad_patience_iter < patience and grad_iter < grad_iter_max:
         grads = calculate_gradient_penalty_fun(var=var, num_var=num_var, num_con=num_con, c=c, q=q, C=C)
@@ -125,15 +130,16 @@ def standard_penalty_alg(num_var, num_con, c, q, ub, lb, C, initial_vector, delt
         grads_prev = grads
         zipped = zip([grads], [var])
         opt.apply_gradients(zipped)
+        clipped_var = tf.minimum(tf.maximum(var, lb), ub)
+        var.assign(clipped_var)
         # var = tf.Variable(tf.where(var< 0, tf.zeros_like(var), var))
         grad_iter += 1
     end_time = time.time()
     var = list(np.array(var[0]))
-    var = [lb[i] if x < lb[i] else ub[i] if x > ub[i] else x for i, x in enumerate(var)]
     J = sum(c[-1][i] * var[i] for i in range(num_var))
     constraint_values = get_constraint_values(var=var, num_var=num_var, num_con=num_con, c=c, q=q)
     runtime = end_time - start_time
-    return [J], [constraint_values], var, [runtime]
+    return [J], [constraint_values], [var], [runtime]
 
 
 def ipdd(
@@ -143,6 +149,8 @@ def ipdd(
     solution = initial_vector
     lambdas = np.array(initial_lambdas, dtype="float32")
     outer_iter = 0
+    lb = tf.constant(lb, dtype=tf.float32)
+    ub = tf.constant(ub, dtype=tf.float32)
     while runtimes[-1] < T:
         outer_iter += 1
         # at each new iteration of outer loop, reset gradient iterations and patience counter.
@@ -165,9 +173,10 @@ def ipdd(
             grads_prev = grads
             zipped = zip([grads], [solution])
             opt.apply_gradients(zipped)
+            clipped_solution = tf.minimum(tf.maximum(solution, lb), ub)
+            solution.assign(clipped_solution)
             grad_iter += 1
         solution = list(np.array(solution[0]))
-        solution = [lb[i] if x < lb[i] else ub[i] if x > ub[i] else x for i, x in enumerate(solution)]
         J = sum(c[-1][i] * solution[i] for i in range(num_var))
         constraint_value = get_constraint_values(var=solution, num_var=num_var, num_con=num_con, c=c, q=q)
         for i in range(num_con):
@@ -228,6 +237,8 @@ def pga(num_var, num_con, c, q, ub, lb, T, C, initial_vector, delta, patience, g
     Js, constraint_values, variables, runtimes = [], [], [], [0]
     epsilon = [0] * num_con
     outer_iteration = 0
+    lb = tf.constant(lb, dtype=tf.float32)
+    ub = tf.constant(ub, dtype=tf.float32)
     while runtimes[-1] < T:
         outer_iteration += 1
         # at each new iteration of outer loop, reset gradient iterations and patience counter.
@@ -250,11 +261,12 @@ def pga(num_var, num_con, c, q, ub, lb, T, C, initial_vector, delta, patience, g
             grads_prev = grads
             zipped = zip([grads], [var])
             opt.apply_gradients(zipped)
+            clipped_var = tf.minimum(tf.maximum(var, lb), ub)
+            var.assign(clipped_var)
             # var = tf.Variable(tf.where(var< 0, tf.zeros_like(var), var))
             grad_iter += 1
         end_time = time.time()
         var = list(np.array(var[0]))
-        var = [lb[i] if x < lb[i] else ub[i] if x > ub[i] else x for i, x in enumerate(var)]
         J = sum(c[-1][i] * var[i] for i in range(num_var))
         constraint_value = get_constraint_values(var=var, num_var=num_var, num_con=num_con, c=c, q=q)
         epsilon = [np.float32(eps - (1 / (outer_iteration ** (1 / 3))) * min(0, constraint_value[i])) for i, eps in
@@ -266,7 +278,8 @@ def pga(num_var, num_con, c, q, ub, lb, T, C, initial_vector, delta, patience, g
     return Js, constraint_values, variables, runtimes[1:]
 
 
-def initialization(problem_spec, grad_spec, initial_vectors, N_init, path):
+def initialization(problem_spec, grad_spec, initial_vectors, path):
+    N_init = len(initial_vectors)
     for i in range(N_init):
         initial_vector = initial_vectors[i]
         suffix = '_'.join(map(str, initial_vector))
@@ -336,21 +349,51 @@ def initialization(problem_spec, grad_spec, initial_vectors, N_init, path):
              name="pga_init_" + suffix)
 
 
-if __name__ == "__main__":
-    path: Path = Path("data/fun_2")
-    mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
-    problem_spec = {
-        "num_con": 2,  # number of constraints
-        "num_var": 2,  # number of variables
-        "c": [[1, 2], [1, 0], [1, 10]],  # coefficients of constraints (the last constraint refers t objective function)
-        "q": [5, 1],  # right-hand side of constraints
-        "T": 200  # time limit
-    }
-    problem_spec["ub"] = [float("inf")] * problem_spec["num_var"]
-    problem_spec["lb"] = [0] * problem_spec["num_var"]
-    grad_spec = {"initial_vector": [25, 25], "initial_lambdas": [0, 0], "patience": 50, "delta": 0.000001,
-                 "grad_iter_max": 25000}
+def parameter_C(problem_spec, grad_spec, Cs, path):
     """
+    This function answers two questions:
+    - How do different strengths of penalty parameter C influence the penalty algorithm with small value of penalty parameter?
+    - How these different strengths influence the PGA performance?
+    :param problem_spec: dict
+    :param grad_spec: dict
+    :param C: list
+    :param path: Path
+    :return: None
+    """
+    for C in Cs:
+        J_pm_lb, constraint_values_pm_lb, vars_lb, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
+                                                                                        num_con=problem_spec["num_con"],
+                                                                                        c=problem_spec["c"],
+                                                                                        q=problem_spec["q"],
+                                                                                        ub=problem_spec["ub"],
+                                                                                        lb=problem_spec["lb"], C=C,
+                                                                                        initial_vector=grad_spec[
+                                                                                            "initial_vector"],
+                                                                                        delta=grad_spec["delta"],
+                                                                                        patience=grad_spec["patience"],
+                                                                                        grad_iter_max=grad_spec[
+                                                                                            "grad_iter_max"])
+        save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path=path,
+             name="pm_lb_" + str(C), vars=vars_lb)
+        J_pga, constraint_values_pga, vars_pga, runtime_pga = pga(num_var=problem_spec["num_var"],
+                                                                  num_con=problem_spec["num_con"],
+                                                                  c=problem_spec["c"],
+                                                                  q=problem_spec["q"], ub=problem_spec["ub"],
+                                                                  lb=problem_spec["lb"], T=problem_spec["T"], C=C,
+                                                                  initial_vector=grad_spec[
+                                                                      "initial_vector"],
+                                                                  delta=grad_spec["delta"],
+                                                                  patience=grad_spec["patience"],
+                                                                  grad_iter_max=grad_spec["grad_iter_max"])
+        save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path,
+             name="pga_" + str(C), vars=vars_pga)
+
+
+if __name__ == "__main__":
+    path: Path = Path("data/fun_1")
+    problem_spec = get_problem_spec("fun_1")
+    grad_spec = get_grad_spec("fun_1")
+    mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
     var, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
                                                          num_con=problem_spec["num_con"], c=problem_spec["c"],
                                                          q=problem_spec["q"],
@@ -419,6 +462,8 @@ if __name__ == "__main__":
                                                          patience=grad_spec["patience"],
                                                          grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga")
-    """
-    initialization(problem_spec, grad_spec, initial_vectors=[[25, 25], [20, 20], [10, 10]], N_init=3,
+    initialization(problem_spec, grad_spec, initial_vectors=[[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
                    path=path.joinpath("initialization"))
+    Cs = [10, 5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]
+    parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=Cs,
+                path=path.joinpath("parameter_C"))
