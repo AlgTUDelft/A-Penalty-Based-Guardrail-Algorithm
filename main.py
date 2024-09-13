@@ -91,7 +91,7 @@ def mps(num_var, num_con, c, q, ub, lb):
     start = time.time()
     m = Model("MPC")
     m.resetParams()
-    x = {i: m.addVar(lb=lb[i], ub=ub[i], name=f"x({i})") for i in range(num_con)}
+    x = {i: m.addVar(lb=lb[i], ub=ub[i], name=f"x({i})") for i in range(num_var)}
     for i in range(num_con):
         m.addCons(quicksum(c[i][j] * x[j] for j in range(num_var)) >= q[i], name=f"constraint({i})")
     objvar = m.addVar(name="J", lb=None, ub=None)
@@ -99,12 +99,12 @@ def mps(num_var, num_con, c, q, ub, lb):
     m.addCons(objvar >= quicksum(c[-1][j] * x[j] for j in range(num_var)))
     m.optimize()
     end = time.time()
-    var = [m.getVal(x[i]) for i in range(num_con)]
+    var = [m.getVal(x[i]) for i in range(num_var)]
     J = m.getVal(objvar)
     constraint_values = get_constraint_values(var=var, num_var=problem_spec["num_var"], num_con=problem_spec["num_con"],
                                               c=problem_spec["c"],
                                               q=problem_spec["q"])
-    return var, [J], [constraint_values], [end - start]
+    return [var], [J], [constraint_values], [end - start]
 
 
 def standard_penalty_alg(num_var, num_con, c, q, ub, lb, C, initial_vector, delta, patience, grad_iter_max):
@@ -113,7 +113,7 @@ def standard_penalty_alg(num_var, num_con, c, q, ub, lb, C, initial_vector, delt
     var = tf.Variable(np.array(initial_vector).reshape(1, -1), dtype=tf.float32)
     opt = tf.keras.optimizers.Adam(learning_rate=0.01)
     grads_prev = tf.convert_to_tensor(
-        np.array([100] * num_con, dtype=np.float32).reshape(1, num_con)
+        np.array([100] * num_var, dtype=np.float32).reshape(1, num_var)
     )
     lb = tf.constant(lb, dtype=tf.float32)
     ub = tf.constant(ub, dtype=tf.float32)
@@ -158,7 +158,7 @@ def ipdd(
         solution = tf.Variable(np.array(solution).reshape(1, -1), dtype=tf.float32)
         opt = tf.keras.optimizers.Adam(learning_rate=0.01)
         grads_prev = tf.convert_to_tensor(
-            np.array([100] * num_con, dtype=np.float32).reshape(1, num_con))
+            np.array([100] * num_var, dtype=np.float32).reshape(1, num_var))
         start_time = time.time()
         while grad_patience_iter < patience and grad_iter < grad_iter_max:
             grads = calculate_gradient_lagrangian_fun(var=solution, num_var=num_var, num_con=num_con, c=c, q=q,
@@ -246,7 +246,7 @@ def pga(num_var, num_con, c, q, ub, lb, T, C, initial_vector, delta, patience, g
         var = tf.Variable(np.array(initial_vector).reshape(1, -1), dtype=tf.float32)
         opt = tf.keras.optimizers.Adam(learning_rate=0.01)
         grads_prev = tf.convert_to_tensor(
-            np.array([100] * num_con, dtype=np.float32).reshape(1, num_con))
+            np.array([100] * num_var, dtype=np.float32).reshape(1, num_var))
         start_time = time.time()
         q_pga = [np.float32(epsilon[i] + x) for i, x in enumerate(q)]
         while grad_patience_iter < patience and grad_iter < grad_iter_max:
@@ -282,6 +282,7 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
     N_init = len(initial_vectors)
     for i in range(N_init):
         initial_vector = initial_vectors[i]
+        print("Initial vector ", initial_vector)
         suffix = '_'.join(map(str, initial_vector))
         J_pm_lb, constraint_values_pm_lb, var, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
                                                                                     num_con=problem_spec["num_con"],
@@ -390,44 +391,46 @@ def parameter_C(problem_spec, grad_spec, Cs, path):
 
 
 if __name__ == "__main__":
-    path: Path = Path("data/fun_1")
-    problem_spec = get_problem_spec("fun_1")
-    grad_spec = get_grad_spec("fun_1")
+    function = "fun_3"
+    path: Path = Path("data").joinpath(function)
+    problem_spec = get_problem_spec(function)
+    grad_spec = get_grad_spec(function)
+    eval_spec = get_eval_spec(function)
     mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
-    var, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
-                                                         num_con=problem_spec["num_con"], c=problem_spec["c"],
-                                                         q=problem_spec["q"],
-                                                         ub=problem_spec["ub"], lb=problem_spec["lb"])
-    save(dict_=mps_dict, J=J_mps, f=constraint_values_mps, runtime=runtime_mps, path=path, name="mps")
-    J_pm_lb, constraint_values_pm_lb, var, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
-                                                                                num_con=problem_spec["num_con"],
-                                                                                c=problem_spec["c"],
-                                                                                q=problem_spec["q"],
-                                                                                ub=problem_spec["ub"],
-                                                                                lb=problem_spec["lb"], C=1,
-                                                                                initial_vector=grad_spec[
-                                                                                    "initial_vector"],
-                                                                                delta=grad_spec["delta"],
-                                                                                patience=grad_spec["patience"],
-                                                                                grad_iter_max=grad_spec[
-                                                                                    "grad_iter_max"])
+    var_mps, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
+                                                             num_con=problem_spec["num_con"], c=problem_spec["c"],
+                                                             q=problem_spec["q"],
+                                                             ub=problem_spec["ub"], lb=problem_spec["lb"])
+    save(dict_=mps_dict, J=J_mps, f=constraint_values_mps, runtime=runtime_mps, path=path, name="mps", vars=var_mps)
+    J_pm_lb, constraint_values_pm_lb, var_pm_lb, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
+                                                                                      num_con=problem_spec["num_con"],
+                                                                                      c=problem_spec["c"],
+                                                                                      q=problem_spec["q"],
+                                                                                      ub=problem_spec["ub"],
+                                                                                      lb=problem_spec["lb"], C=1,
+                                                                                      initial_vector=grad_spec[
+                                                                                          "initial_vector"],
+                                                                                      delta=grad_spec["delta"],
+                                                                                      patience=grad_spec["patience"],
+                                                                                      grad_iter_max=grad_spec[
+                                                                                          "grad_iter_max"])
     save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path=path,
-         name="pm_lb")
-    J_pm_ub, constraint_values_pm_ub, var, runtime_pm_ub = standard_penalty_alg(num_var=problem_spec["num_var"],
-                                                                                num_con=problem_spec["num_con"],
-                                                                                c=problem_spec["c"],
-                                                                                q=problem_spec["q"],
-                                                                                ub=problem_spec["ub"],
-                                                                                lb=problem_spec["lb"], C=100,
-                                                                                initial_vector=grad_spec[
-                                                                                    "initial_vector"],
-                                                                                delta=grad_spec["delta"],
-                                                                                patience=grad_spec["patience"],
-                                                                                grad_iter_max=grad_spec[
-                                                                                    "grad_iter_max"])
+         name="pm_lb", vars=var_pm_lb)
+    J_pm_ub, constraint_values_pm_ub, var_pm_ub, runtime_pm_ub = standard_penalty_alg(num_var=problem_spec["num_var"],
+                                                                                      num_con=problem_spec["num_con"],
+                                                                                      c=problem_spec["c"],
+                                                                                      q=problem_spec["q"],
+                                                                                      ub=problem_spec["ub"],
+                                                                                      lb=problem_spec["lb"], C=100,
+                                                                                      initial_vector=grad_spec[
+                                                                                          "initial_vector"],
+                                                                                      delta=grad_spec["delta"],
+                                                                                      patience=grad_spec["patience"],
+                                                                                      grad_iter_max=grad_spec[
+                                                                                          "grad_iter_max"])
     save(dict_=pm_ub_dict, J=J_pm_ub, f=constraint_values_pm_ub, runtime=runtime_pm_ub, path=path,
-         name="pm_ub")
-    J_ipdd, constraint_values_ipdd, var, runtime_ipdd = ipdd(
+         name="pm_ub", vars=var_pm_ub)
+    J_ipdd, constraint_values_ipdd, var_ipdd, runtime_ipdd = ipdd(
         num_var=problem_spec["num_var"],
         num_con=problem_spec["num_con"],
         c=problem_spec["c"],
@@ -439,31 +442,33 @@ if __name__ == "__main__":
         delta=grad_spec["delta"],
         patience=grad_spec["patience"],
         grad_iter_max=grad_spec["grad_iter_max"])
-    save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path=path, name="ipdd")
-    J_gdpa, constraint_values_gdpa, var, runtime_gdpa = gdpa(num_var=problem_spec["num_var"],
+    save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path=path, name="ipdd",
+         vars=var_ipdd)
+    J_gdpa, constraint_values_gdpa, var_gdpa, runtime_gdpa = gdpa(num_var=problem_spec["num_var"],
+                                                                  num_con=problem_spec["num_con"],
+                                                                  c=problem_spec["c"], q=problem_spec["q"],
+                                                                  ub=problem_spec["ub"],
+                                                                  lb=problem_spec["lb"],
+                                                                  T=problem_spec["T"],
+                                                                  initial_vector=np.array(grad_spec["initial_vector"]),
+                                                                  initial_lambdas=np.array(
+                                                                      [0] * problem_spec["num_con"]),
+                                                                  step_size=1,
+                                                                  perturbation_term=0.9,
+                                                                  beta=0.9, gamma=1)
+    save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path, name="gdpa",
+         vars=var_gdpa)
+    J_pga, constraint_values_pga, var_pga, runtime_pga = pga(num_var=problem_spec["num_var"],
                                                              num_con=problem_spec["num_con"],
-                                                             c=problem_spec["c"], q=problem_spec["q"],
-                                                             ub=problem_spec["ub"],
-                                                             lb=problem_spec["lb"],
-                                                             T=problem_spec["T"],
-                                                             initial_vector=np.array(grad_spec["initial_vector"]),
-                                                             initial_lambdas=np.array([0, 0]),
-                                                             step_size=1,
-                                                             perturbation_term=0.9,
-                                                             beta=0.9, gamma=1)
-    save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path, name="gdpa")
-    J_pga, constraint_values_pga, var, runtime_pga = pga(num_var=problem_spec["num_var"],
-                                                         num_con=problem_spec["num_con"],
-                                                         c=problem_spec["c"],
-                                                         q=problem_spec["q"], ub=problem_spec["ub"],
-                                                         lb=problem_spec["lb"], T=problem_spec["T"], C=1,
-                                                         initial_vector=grad_spec["initial_vector"],
-                                                         delta=grad_spec["delta"],
-                                                         patience=grad_spec["patience"],
-                                                         grad_iter_max=grad_spec["grad_iter_max"])
-    save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga")
-    initialization(problem_spec, grad_spec, initial_vectors=[[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
+                                                             c=problem_spec["c"],
+                                                             q=problem_spec["q"], ub=problem_spec["ub"],
+                                                             lb=problem_spec["lb"], T=problem_spec["T"], C=1,
+                                                             initial_vector=grad_spec["initial_vector"],
+                                                             delta=grad_spec["delta"],
+                                                             patience=grad_spec["patience"],
+                                                             grad_iter_max=grad_spec["grad_iter_max"])
+    save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga", vars=var_pga)
+    initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
                    path=path.joinpath("initialization"))
-    Cs = [10, 5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]
-    parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=Cs,
+    parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
                 path=path.joinpath("parameter_C"))

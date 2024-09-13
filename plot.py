@@ -1,8 +1,11 @@
+import json
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pathlib import Path
 
+from optimization_specs import *
 from collections import OrderedDict
 
 linestyles = OrderedDict(
@@ -158,7 +161,7 @@ def get_element_end_iteration(opt_name, path, initial_solutions):
         suffix = '_'.join(map(str, initial_vector))
         data = pd.read_json(path.joinpath(opt_name + "_init_" + suffix + ".json"))
         print("Objective function value ", data["J"].tolist()[-1])
-        print("Constraint violation ", abs(min(0, max(data["f"].tolist()[-1], key=abs))))
+        print("Constraint violation:", abs(max([x for x in data["f"].tolist()[-1] if x < 0] or [0])))
 
 
 def objective_value_initialization(num_con, T, opt_name, path, path_w, freq_s):
@@ -240,16 +243,122 @@ def constraint_violation_initialization(num_con, T, opt_name, path, path_w, freq
     plt.show()
 
 
+def parameter_C(opt_names, T, Cs, path_r, path_w):
+    # Define colors and styles
+    opts = ["#36FF33", "#B6C800", "#f119c3", "#0d5915", "#E31D1D", "#1c24dc"]
+    if len(opts) < len(Cs):
+        raise ValueError("The number of parameters C must be at least equal to the number of C values.")
+    colors = {}
+    for i, C in enumerate(Cs):
+        colors[str(C)] = opts[i]
+    styles = {
+        'pm_lb': {'linestyle': '--', 'marker': 'o', "markersize": 7},
+        'pga': {'linestyle': '-', 'marker': '*', "markersize": 10}
+    }
+
+    plt.figure(figsize=(12, 6))
+
+    # First set of lines for C values
+    for C in Cs:
+        for opt_name in opt_names:
+            filename = f"{opt_name}_{C}.json"
+            filepath = path_r.joinpath(filename)
+
+            data = pd.read_json(filepath)
+
+            plt.plot(data["runtime"], data["J"],
+                     color=colors[str(C)],
+                     **styles[opt_name])
+            if opt_name == "pm_lb":
+                plt.axhline(
+                    y=data["J"][0],
+                    xmin=data["runtime"][0] / (T),
+                    xmax=1,
+                    color=colors[str(C)],
+                    linestyle=styles[opt_name]["linestyle"])
+
+    # Create legend for C values
+    C_legend = [plt.Line2D([0], [0], color=colors[str(C)], lw=2, label=f'C={C}') for C in Cs]
+
+    # Create legend for optimizers
+    opt_legend = [plt.Line2D([0], [0], **styles[opt], color='black', label=visualization_spec[opt]["label"]) for opt in
+                  opt_names]
+
+    # Add C values legend
+    first_legend = plt.legend(handles=C_legend, title='C values', loc='upper left')
+    plt.gca().add_artist(first_legend)
+
+    # Add Optimizers legend
+    plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
+
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Objective value", fontsize=14)
+    plt.xlim([0, T])
+    plt.grid()
+    plt.savefig(path_w.joinpath("objective_value_parameter_C.svg"), format='svg')
+    plt.show()
+
+    plt.figure(figsize=(12, 6))
+
+    # First set of lines for C values
+    for C in Cs:
+        for opt_name in opt_names:
+            filename = f"{opt_name}_{C}.json"
+            filepath = path_r.joinpath(filename)
+
+            data = pd.read_json(filepath)
+            constraint_violations = []
+            f = data["f"].tolist()
+            for i in range(len(f)):
+                constraint_violations.append(abs(min(0, min(f[i]))))
+
+            plt.plot(data["runtime"], constraint_violations,
+                     color=colors[str(C)],
+                     **styles[opt_name])
+            if opt_name == "pm_lb":
+                plt.axhline(
+                    y=constraint_violations[0],
+                    xmin=data["runtime"][0] / (T),
+                    xmax=1,
+                    color=colors[str(C)],
+                    linestyle=styles[opt_name]["linestyle"])
+
+    # Create legend for C values
+    C_legend = [plt.Line2D([0], [0], color=colors[str(C)], lw=2, label=f'C={C}') for C in Cs]
+
+    # Create legend for optimizers
+    opt_legend = [plt.Line2D([0], [0], **styles[opt], color='black', label=visualization_spec[opt]["label"]) for opt in
+                  opt_names]
+
+    # Add C values legend
+    first_legend = plt.legend(handles=C_legend, title='C values', loc='upper left')
+    plt.gca().add_artist(first_legend)
+
+    # Add Optimizers legend
+    plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
+
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlim([0, T])
+    plt.grid()
+    plt.savefig(path_w.joinpath("constraint_violations_parameter_C.svg"), format='svg')
+    plt.show()
+
+
 if __name__ == "__main__":
-    path_read: Path = Path("data/fun_2")
-    path_write: Path = Path("plots/fun_2")
-    objective_value(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=path_read,
+    path_read: Path = Path("data/fun_1")
+    path_write: Path = Path("plots/fun_1")
+    problem_spec = get_problem_spec("fun_1")
+    grad_spec = get_grad_spec("fun_1")
+    opt_name = ["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"]
+    """
+    objective_value(2, 200, opt_name=opt_name, path=path_read,
                     path_w=path_write,
                     freq_s=10)
-    constraint_violation(2, 200, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], path=path_read,
+    constraint_violation(2, 200, opt_name=opt_name, path=path_read,
                          path_w=path_write,
                          freq_s=10)
-    opt_names_init = form_optimizers_init_names(opt_names=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
+    opt_names_init = form_optimizers_init_names(opt_names=opt_name,
                                                 opt_names_init=["mps", "pm_lb_init_25_25", "pm_ub_init_25_25",
                                                                 "ipdd_init_25_25"],
                                                 initializations=[[25, 25], [20, 20], [10, 10]])
@@ -259,5 +368,8 @@ if __name__ == "__main__":
     constraint_violation_initialization(2, 200, opt_name=opt_names_init,
                                         path=path_read.joinpath("initialization"), path_w=path_write,
                                         freq_s=10)
-    # get_element_end_iteration(opt_name="gdpa", path=path.joinpath("initialization"),
-    #                          initial_solutions=[[50, 50], [25, 25], [20, 20], [10, 10]])
+                                        """
+    get_element_end_iteration(opt_name="pga", path=path_read.joinpath("initialization"),
+                              initial_solutions=[[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]])
+    # parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[10, 5, 1, 0.75, 0.5, 0.25],
+    #            path_r=path_read.joinpath("parameter_C"), path_w=path_write)
