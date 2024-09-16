@@ -322,9 +322,6 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
             delta=grad_spec["delta"],
             patience=grad_spec["patience"],
             grad_iter_max=grad_spec["grad_iter_max"])
-        print("J ipdd ", J_ipdd)
-        print("f_i ipdd ", constraint_values_ipdd)
-        print("Runtime ipdd", runtime_ipdd)
         save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path=path,
              name="ipdd_init_" + suffix)
         J_gdpa, constraint_values_gdpa, var, runtime_gdpa = gdpa(num_var=problem_spec["num_var"],
@@ -395,13 +392,12 @@ def parameter_C(problem_spec, grad_spec, Cs, path):
 
 
 if __name__ == "__main__":
-    function = "fun_3"
+    function = "fun_4"
     path: Path = Path("data").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
     eval_spec = get_eval_spec(function)
     mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
-    """
     var_mps, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
                                                              num_con=problem_spec["num_con"], c=problem_spec["c"],
                                                              q=problem_spec["q"],
@@ -474,7 +470,6 @@ if __name__ == "__main__":
                                                              patience=grad_spec["patience"],
                                                              grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga", vars=var_pga)
-    """
     initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
                    path=path.joinpath("initialization"))
     parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],

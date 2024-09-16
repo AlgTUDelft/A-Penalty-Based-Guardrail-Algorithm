@@ -33,7 +33,7 @@ PROBLEM_SPECS = {
         "num_var": 2,
         "c": [[1, 2], [3, 1], [1, 1]],
         "q": [4, 5],
-        "T": 200,
+        "T": 50,
         "ub": [float("inf")] * 2,
         "lb": [0] * 2
     }
@@ -79,10 +79,9 @@ EVAL_SPECS = {
                                   [20] * PROBLEM_SPECS["fun_3"]["num_var"], [10] * PROBLEM_SPECS["fun_3"]["num_var"],
                                   [5] * PROBLEM_SPECS["fun_3"]["num_var"], [0] * PROBLEM_SPECS["fun_3"]["num_var"]],
               "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]},
-    "fun_4": {"initial_vectors": [[50] * PROBLEM_SPECS["fun_4"]["num_var"], [25] * PROBLEM_SPECS["fun_4"]["num_var"],
-                                  [20] * PROBLEM_SPECS["fun_4"]["num_var"], [10] * PROBLEM_SPECS["fun_4"]["num_var"],
-                                  [5] * PROBLEM_SPECS["fun_4"]["num_var"], [0] * PROBLEM_SPECS["fun_4"]["num_var"]],
-              "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]}
+    "fun_4": {"initial_vectors": [[10] * PROBLEM_SPECS["fun_4"]["num_var"], [5] * PROBLEM_SPECS["fun_4"]["num_var"],
+                                  [2.5] * PROBLEM_SPECS["fun_4"]["num_var"], [0] * PROBLEM_SPECS["fun_4"]["num_var"]],
+              "Cs": [5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]}
 }
 
 

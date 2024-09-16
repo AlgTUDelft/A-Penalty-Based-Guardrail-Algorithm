@@ -63,6 +63,7 @@ visualization_spec_init = {
 
 
 def objective_value(num_con, T, opt_name, path, path_w, freq_s):
+    plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(opt + ".json"))
@@ -101,6 +102,7 @@ def objective_value(num_con, T, opt_name, path, path_w, freq_s):
 
 
 def constraint_violation(num_con, T, opt_name, path, path_w, freq_s):
+    plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(f"{opt}.json"))[["f", "runtime"]]
@@ -165,6 +167,7 @@ def get_element_end_iteration(opt_name, path, initial_solutions):
 
 
 def objective_value_initialization(num_con, T, opt_name, path, path_w, freq_s):
+    plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(opt + ".json"))
@@ -203,6 +206,7 @@ def objective_value_initialization(num_con, T, opt_name, path, path_w, freq_s):
 
 
 def constraint_violation_initialization(num_con, T, opt_name, path, path_w, freq_s):
+    plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
         data = pd.read_json(path.joinpath(f"{opt}.json"))[["f", "runtime"]]
@@ -346,31 +350,30 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
 
 
 if __name__ == "__main__":
-    function = "fun_4"
+    function = "fun_3"
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
+    eval_spec = get_eval_spec(function)
     opt_name = ["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"]
-    objective_value(2, 200, opt_name=opt_name, path=path_read,
+    objective_value(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
                     path_w=path_write,
                     freq_s=10)
-    constraint_violation(2, 200, opt_name=opt_name, path=path_read,
+    constraint_violation(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
                          path_w=path_write,
                          freq_s=10)
-    """
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
                                                 opt_names_init=["mps", "pm_lb_init_25_25", "pm_ub_init_25_25",
                                                                 "ipdd_init_25_25"],
                                                 initializations=[[25, 25], [20, 20], [10, 10]])
-    objective_value_initialization(2, 200, opt_name=opt_names_init,
+    objective_value_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
                                    path=path_read.joinpath("initialization"), path_w=path_write,
                                    freq_s=10)
-    constraint_violation_initialization(2, 200, opt_name=opt_names_init,
+    constraint_violation_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
                                         path=path_read.joinpath("initialization"), path_w=path_write,
                                         freq_s=10)
     get_element_end_iteration(opt_name="pga", path=path_read.joinpath("initialization"),
-                              initial_solutions=[[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]])
-    """
-    # parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[10, 5, 1, 0.75, 0.5, 0.25],
-    #            path_r=path_read.joinpath("parameter_C"), path_w=path_write)
+                              initial_solutions=eval_spec["initial_vectors"])
+    parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[10, 5, 1, 0.75, 0.5, 0.25],
+                path_r=path_read.joinpath("parameter_C"), path_w=path_write)
