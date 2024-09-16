@@ -346,18 +346,19 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
 
 
 if __name__ == "__main__":
-    path_read: Path = Path("data/fun_1")
-    path_write: Path = Path("plots/fun_1")
-    problem_spec = get_problem_spec("fun_1")
-    grad_spec = get_grad_spec("fun_1")
+    function = "fun_4"
+    path_read: Path = Path("data").joinpath(function)
+    path_write: Path = Path("plots").joinpath(function)
+    problem_spec = get_problem_spec(function)
+    grad_spec = get_grad_spec(function)
     opt_name = ["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"]
-    """
     objective_value(2, 200, opt_name=opt_name, path=path_read,
                     path_w=path_write,
                     freq_s=10)
     constraint_violation(2, 200, opt_name=opt_name, path=path_read,
                          path_w=path_write,
                          freq_s=10)
+    """
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
                                                 opt_names_init=["mps", "pm_lb_init_25_25", "pm_ub_init_25_25",
                                                                 "ipdd_init_25_25"],
@@ -368,8 +369,8 @@ if __name__ == "__main__":
     constraint_violation_initialization(2, 200, opt_name=opt_names_init,
                                         path=path_read.joinpath("initialization"), path_w=path_write,
                                         freq_s=10)
-                                        """
     get_element_end_iteration(opt_name="pga", path=path_read.joinpath("initialization"),
                               initial_solutions=[[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]])
+    """
     # parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[10, 5, 1, 0.75, 0.5, 0.25],
     #            path_r=path_read.joinpath("parameter_C"), path_w=path_write)
