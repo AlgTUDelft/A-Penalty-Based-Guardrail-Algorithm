@@ -350,7 +350,7 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
 
 
 if __name__ == "__main__":
-    function = "fun_3"
+    function = "fun_4"
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
     problem_spec = get_problem_spec(function)

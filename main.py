@@ -284,7 +284,7 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
     for i in range(N_init):
         initial_vector = initial_vectors[i]
         suffix = '_'.join(map(str, initial_vector))
-        J_pm_lb, constraint_values_pm_lb, var, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
+        J_pm_lb, constraint_values_pm_lb, var_pm_lb, runtime_pm_lb = standard_penalty_alg(num_var=problem_spec["num_var"],
                                                                                     num_con=problem_spec["num_con"],
                                                                                     c=problem_spec["c"],
                                                                                     q=problem_spec["q"],
@@ -296,8 +296,8 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
                                                                                     grad_iter_max=grad_spec[
                                                                                         "grad_iter_max"])
         save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path=path,
-             name="pm_lb_init_" + suffix)
-        J_pm_ub, constraint_values_pm_ub, var, runtime_pm_ub = standard_penalty_alg(num_var=problem_spec["num_var"],
+             name="pm_lb_init_" + suffix, vars=var_pm_lb)
+        J_pm_ub, constraint_values_pm_ub, var_pm_ub, runtime_pm_ub = standard_penalty_alg(num_var=problem_spec["num_var"],
                                                                                     num_con=problem_spec["num_con"],
                                                                                     c=problem_spec["c"],
                                                                                     q=problem_spec["q"],
@@ -309,8 +309,8 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
                                                                                     grad_iter_max=grad_spec[
                                                                                         "grad_iter_max"])
         save(dict_=pm_ub_dict, J=J_pm_ub, f=constraint_values_pm_ub, runtime=runtime_pm_ub, path=path,
-             name="pm_ub_init_" + suffix)
-        J_ipdd, constraint_values_ipdd, var, runtime_ipdd = ipdd(
+             name="pm_ub_init_" + suffix, vars=var_pm_ub)
+        J_ipdd, constraint_values_ipdd, var_ipdd, runtime_ipdd = ipdd(
             num_var=problem_spec["num_var"],
             num_con=problem_spec["num_con"],
             c=problem_spec["c"],
@@ -323,8 +323,8 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
             patience=grad_spec["patience"],
             grad_iter_max=grad_spec["grad_iter_max"])
         save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path=path,
-             name="ipdd_init_" + suffix)
-        J_gdpa, constraint_values_gdpa, var, runtime_gdpa = gdpa(num_var=problem_spec["num_var"],
+             name="ipdd_init_" + suffix, vars=var_ipdd)
+        J_gdpa, constraint_values_gdpa, var_gdpa, runtime_gdpa = gdpa(num_var=problem_spec["num_var"],
                                                                  num_con=problem_spec["num_con"],
                                                                  c=problem_spec["c"], q=problem_spec["q"],
                                                                  ub=problem_spec["ub"],
@@ -337,8 +337,8 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
                                                                  perturbation_term=0.9,
                                                                  beta=0.9, gamma=1)
         save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path,
-             name="gdpa_init_" + suffix)
-        J_pga, constraint_values_pga, var, runtime_pga = pga(num_var=problem_spec["num_var"],
+             name="gdpa_init_" + suffix, vars=var_gdpa)
+        J_pga, constraint_values_pga, var_pga, runtime_pga = pga(num_var=problem_spec["num_var"],
                                                              num_con=problem_spec["num_con"],
                                                              c=problem_spec["c"],
                                                              q=problem_spec["q"], ub=problem_spec["ub"],
@@ -348,7 +348,7 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
                                                              patience=grad_spec["patience"],
                                                              grad_iter_max=grad_spec["grad_iter_max"])
         save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path,
-             name="pga_init_" + suffix)
+             name="pga_init_" + suffix, vars=var_pga)
 
 
 def parameter_C(problem_spec, grad_spec, Cs, path):
@@ -392,7 +392,7 @@ def parameter_C(problem_spec, grad_spec, Cs, path):
 
 
 if __name__ == "__main__":
-    function = "fun_4"
+    function = "fun_5"
     path: Path = Path("data").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
@@ -470,7 +470,9 @@ if __name__ == "__main__":
                                                              patience=grad_spec["patience"],
                                                              grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga", vars=var_pga)
+    """
     initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
                    path=path.joinpath("initialization"))
     parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
                 path=path.joinpath("parameter_C"))
+    """
