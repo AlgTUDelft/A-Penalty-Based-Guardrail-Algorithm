@@ -350,7 +350,7 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
 
 
 if __name__ == "__main__":
-    function = "fun_4"
+    function = "fun_3"
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
     problem_spec = get_problem_spec(function)
@@ -367,6 +367,7 @@ if __name__ == "__main__":
                                                 opt_names_init=["mps", "pm_lb_init_25_25", "pm_ub_init_25_25",
                                                                 "ipdd_init_25_25"],
                                                 initializations=[[25, 25], [20, 20], [10, 10]])
+    """
     objective_value_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
                                    path=path_read.joinpath("initialization"), path_w=path_write,
                                    freq_s=10)
@@ -375,5 +376,6 @@ if __name__ == "__main__":
                                         freq_s=10)
     get_element_end_iteration(opt_name="pga", path=path_read.joinpath("initialization"),
                               initial_solutions=eval_spec["initial_vectors"])
+    """
     parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[10, 5, 1, 0.75, 0.5, 0.25],
                 path_r=path_read.joinpath("parameter_C"), path_w=path_write)

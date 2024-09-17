@@ -99,28 +99,32 @@ GRADIENT_SPECS = {
         "initial_lambdas": [0, 0],
         "patience": 50,
         "delta": 0.000001,
-        "grad_iter_max": 25000
+        "grad_iter_max": 25000,
+        "C": 1
     },
     "fun_2": {
         "initial_vector": [25, 25],
         "initial_lambdas": [0, 0],
         "patience": 50,
         "delta": 0.000001,
-        "grad_iter_max": 25000
+        "grad_iter_max": 25000,
+        "C": 1
     },
     "fun_3": {
         "initial_vector": [25] * PROBLEM_SPECS["fun_3"]["num_var"],
         "initial_lambdas": [0] * PROBLEM_SPECS["fun_3"]["num_con"],
         "patience": 50,
         "delta": 0.000001,
-        "grad_iter_max": 25000
+        "grad_iter_max": 25000,
+        "C": 0.75
     },
     "fun_4": {
         "initial_vector": [5] * PROBLEM_SPECS["fun_4"]["num_var"],
         "initial_lambdas": [0] * PROBLEM_SPECS["fun_4"]["num_con"],
         "patience": 50,
         "delta": 0.000001,
-        "grad_iter_max": 25000
+        "grad_iter_max": 25000,
+        "C": 0.1
     },
     "fun_5": {
         "initial_vector": get_initial_vector(initial_solution=[1] * PROBLEM_SPECS["fun_5"]["num_var"],
