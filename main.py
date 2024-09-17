@@ -395,7 +395,7 @@ def parameter_C(problem_spec, grad_spec, Cs, path):
 
 
 if __name__ == "__main__":
-    function = "fun_3"
+    function = "fun_4"
     path: Path = Path("data").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
