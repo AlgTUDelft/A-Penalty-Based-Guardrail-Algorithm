@@ -88,6 +88,7 @@ def mps(num_var, num_con, c, q, ub, lb, T):
     """"
     Solution derived by mathematical programming solver (MPS).
     """
+    print("MPS")
     start = time.time()
     m = Model("MPC")
     m.resetParams()
@@ -109,6 +110,7 @@ def mps(num_var, num_con, c, q, ub, lb, T):
 
 
 def standard_penalty_alg(num_var, num_con, c, q, ub, lb, C, initial_vector, delta, patience, grad_iter_max):
+    print("PM")
     # at each new iteration of outer loop, reset gradient iterations and patience counter.
     grad_iter, grad_patience_iter = 0, 0
     var = tf.Variable(np.array(initial_vector).reshape(1, -1), dtype=tf.float32)
@@ -146,6 +148,7 @@ def standard_penalty_alg(num_var, num_con, c, q, ub, lb, C, initial_vector, delt
 def ipdd(
         num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, rho, delta, patience, grad_iter_max,
 ):
+    print("IPDD")
     Js, constraint_values, solutions, runtimes = [], [], [], [0]
     solution = initial_vector
     lambdas = np.array(initial_lambdas, dtype="float32")
@@ -192,6 +195,7 @@ def ipdd(
 
 
 def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, step_size, perturbation_term, beta, gamma):
+    print("GDPA")
     Js, constraint_values, solutions, runtimes = [], [], [], [0]
     solution_prev = initial_vector
     lambdas_prev = initial_lambdas
@@ -235,6 +239,7 @@ def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, ste
 
 
 def pga(num_var, num_con, c, q, ub, lb, T, C, initial_vector, delta, patience, grad_iter_max):
+    print("PGA")
     Js, constraint_values, variables, runtimes = [], [], [], [0]
     epsilon = [0] * num_con
     outer_iteration = 0
@@ -395,7 +400,7 @@ def parameter_C(problem_spec, grad_spec, Cs, path):
 
 
 if __name__ == "__main__":
-    function = "fun_4"
+    function = "fun_5"
     path: Path = Path("data").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
@@ -475,7 +480,7 @@ if __name__ == "__main__":
                                                              patience=grad_spec["patience"],
                                                              grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga", vars=var_pga)
-    initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
-                   path=path.joinpath("initialization"))
-    parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
-                path=path.joinpath("parameter_C"))
+    # initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
+    #               path=path.joinpath("initialization"))
+    # parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
+    #            path=path.joinpath("parameter_C"))

@@ -39,27 +39,27 @@ visualization_spec = {
 visualization_spec_init = {
     "mps": {"color": "#36FF33", "marker": "s", "linestyle": "solid", "label": r"$MPS(\mathbf{x}^0_{max})$",
             "markersize": 12},
-    "pm_lb_init_25_25": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
-                         "label": r"$PM_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 12},
-    "pm_ub_init_25_25": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
-                         "label": r"$PM_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 12},
-    "ipdd_init_25_25": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
-                        "label": r"$IPDD(\mathbf{x}^0_{max})$",
-                        "markersize": 15},
-    "gdpa_init_25_25": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
-                        "label": r"$GDPA(\mathbf{x}^0_{max})$",
-                        "markersize": 10},
-    "gdpa_init_20_20": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
-                        "label": r"$GDPA(\mathbf{x}^0_1)$", "markersize": 6},
-    "gdpa_init_10_10": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
-                        "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
-    "pga_init_25_25": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
-                       "label": r"$PGA(\mathbf{x}^0_{max})$",
-                       "markersize": 10},
-    "pga_init_20_20": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
-                       "label": r"$PGA(\mathbf{x}^0_1)$", "markersize": 6},
-    "pga_init_10_10": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
-                       "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
+    "pm_lb_init_25_25_25_25_25": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
+                                  "label": r"$PM_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 12},
+    "pm_ub_init_25_25_25_25_25": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
+                                  "label": r"$PM_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 12},
+    "ipdd_init_25_25_25_25_25": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
+                                 "label": r"$IPDD(\mathbf{x}^0_{max})$",
+                                 "markersize": 15},
+    "gdpa_init_25_25_25_25_25": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
+                                 "label": r"$GDPA(\mathbf{x}^0_{max})$",
+                                 "markersize": 10},
+    "gdpa_init_20_20_20_20_20": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
+                                 "label": r"$GDPA(\mathbf{x}^0_1)$", "markersize": 6},
+    "gdpa_init_10_10_10_10_10": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
+                                 "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
+    "pga_init_25_25_25_25_25": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
+                                "label": r"$PGA(\mathbf{x}^0_{max})$",
+                                "markersize": 10},
+    "pga_init_20_20_20_20_20": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
+                                "label": r"$PGA(\mathbf{x}^0_1)$", "markersize": 6},
+    "pga_init_10_10_10_10_10": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
+                                "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
 
 
 def objective_value(num_con, T, opt_name, path, path_w, freq_s):
@@ -364,10 +364,11 @@ if __name__ == "__main__":
                          path_w=path_write,
                          freq_s=10)
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
-                                                opt_names_init=["mps", "pm_lb_init_25_25", "pm_ub_init_25_25",
-                                                                "ipdd_init_25_25"],
-                                                initializations=[[25, 25], [20, 20], [10, 10]])
-    """
+                                                opt_names_init=["mps", "pm_lb_init_25_25_25_25_25",
+                                                                "pm_ub_init_25_25_25_25_25",
+                                                                "ipdd_init_25_25_25_25_25"],
+                                                initializations=[[25, 25, 25, 25, 25], [20, 20, 20, 20, 20],
+                                                                 [10, 10, 10, 10, 10]])
     objective_value_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
                                    path=path_read.joinpath("initialization"), path_w=path_write,
                                    freq_s=10)
@@ -376,6 +377,5 @@ if __name__ == "__main__":
                                         freq_s=10)
     get_element_end_iteration(opt_name="pga", path=path_read.joinpath("initialization"),
                               initial_solutions=eval_spec["initial_vectors"])
-    """
-    parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[10, 5, 1, 0.75, 0.5, 0.25],
+    parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[1, 0.75, 0.5, 0.25, 0.1, 0.01],
                 path_r=path_read.joinpath("parameter_C"), path_w=path_write)

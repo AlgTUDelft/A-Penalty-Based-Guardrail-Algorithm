@@ -1,5 +1,6 @@
 import json
 import random
+import pickle
 from typing import Dict, List, Union
 from pathlib import Path
 
@@ -11,14 +12,14 @@ def weighted_random():
         return random.randint(1, 9)
 
 
-def large_linear_program(num_var, num_con, T, path):
+def large_linear_program(num_var, num_con, path):
     if Path(path).exists():
         print("Function specification already exists")
-        with open(path, 'r') as f:
-            return json.load(f)
+        with open(path, 'rb') as f:
+            return pickle.load(f)
     else:
         print("Function specification created")
-        fun = {"num_con": num_con, "num_var": num_var, "c": [], "q": [], "T": T}
+        fun = {"num_con": num_con, "num_var": num_var, "c": [], "q": []}
 
         fun["ub"] = [float("inf")] * fun["num_var"]
         fun["lb"] = [0] * fun["num_var"]
@@ -26,15 +27,23 @@ def large_linear_program(num_var, num_con, T, path):
         # coefficients constraints
         for i in range(fun["num_con"]):
             fun["c"].append([weighted_random() for _ in range(fun["num_var"])])
-            q_mul = random.uniform(0.1, 1.0)
+            q_mul = random.uniform(0.01, 1.0)
             fun["q"].append(int(sum(fun["c"][-1]) * q_mul))
         # coefficients objective function
         fun["c"].append([random.randint(1, 9) for _ in range(fun["num_var"])])
 
         random.shuffle(fun["q"])
 
-        with open(path, 'w') as f:
-            json.dump(fun, f, indent=2)
+        with open(path, 'wb') as f:
+            pickle.dump(fun, f)
+        # Save 'fun["q"]' into a JSON file for visual inspection
+        q_json_path = path.with_name(path.stem + '_q.json')
+        with open(q_json_path, 'w') as f_json:
+            json.dump(fun["q"], f_json, indent=2)
+        # Save 'fun["c"]' into a JSON file for visual inspection
+        c_json_path = path.with_name(path.stem + '_c.json')
+        with open(c_json_path, 'w') as f_json:
+            json.dump(fun["c"][-1], f_json, indent=2)
         return fun
 
 
@@ -90,9 +99,9 @@ PROBLEM_SPECS = {"fun_1": {
     "T": 200,
     "ub": [float("inf")] * 2,
     "lb": [0] * 2
-}, "fun_5": large_linear_program(num_con=2, num_var=3, T=200,
-                                 path=Path("data/fun_5").joinpath("fun_5.json"))}
-
+}, "fun_5": large_linear_program(num_con=10000, num_var=10000,
+                                 path=Path("data/fun_5").joinpath("fun_5.pickle"))}
+PROBLEM_SPECS["fun_5"]["T"] = 100
 GRADIENT_SPECS = {
     "fun_1": {
         "initial_vector": [25, 25],
@@ -127,12 +136,13 @@ GRADIENT_SPECS = {
         "C": 0.1
     },
     "fun_5": {
-        "initial_vector": get_initial_vector(initial_solution=[1] * PROBLEM_SPECS["fun_5"]["num_var"],
+        "initial_vector": get_initial_vector(initial_solution=[25] * PROBLEM_SPECS["fun_5"]["num_var"],
                                              problem_spec=PROBLEM_SPECS["fun_5"]),
         "initial_lambdas": [0] * PROBLEM_SPECS["fun_5"]["num_con"],
         "patience": 50,
         "delta": 0.000001,
-        "grad_iter_max": 25000
+        "grad_iter_max": 25000,
+        "C": 1
     }
 }
 
