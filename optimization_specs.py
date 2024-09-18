@@ -101,7 +101,7 @@ PROBLEM_SPECS = {"fun_1": {
     "lb": [0] * 2
 }, "fun_5": large_linear_program(num_con=10000, num_var=10000,
                                  path=Path("data/fun_5").joinpath("fun_5.pickle"))}
-PROBLEM_SPECS["fun_5"]["T"] = 100
+PROBLEM_SPECS["fun_5"]["T"] = 1000
 GRADIENT_SPECS = {
     "fun_1": {
         "initial_vector": [25, 25],
