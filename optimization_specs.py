@@ -2,6 +2,7 @@ import json
 import random
 import pickle
 from typing import Dict, List, Union
+import numpy as np
 from pathlib import Path
 
 
@@ -62,6 +63,7 @@ def get_initial_vector(initial_solution, problem_spec):
     try:
         # First, try the all-ones vector
         if verify_initial_vector(initial_solution=initial_solution, program_spec=problem_spec):
+            print("Feasible initial solution!")
             return initial_solution
     except ValueError:
         raise ValueError("Unsuitable initial solution!")
@@ -99,16 +101,16 @@ PROBLEM_SPECS = {"fun_1": {
     "T": 200,
     "ub": [float("inf")] * 2,
     "lb": [0] * 2
-}, "fun_5": large_linear_program(num_con=10000, num_var=10000,
+}, "fun_5": large_linear_program(num_con=1, num_var=1,
                                  path=Path("data/fun_5").joinpath("fun_5.pickle"))}
 PROBLEM_SPECS["fun_5"]["T"] = 1000
 GRADIENT_SPECS = {
     "fun_1": {
-        "initial_vector": [25, 25],
-        "initial_lambdas": [0, 0],
-        "patience": 50,
+        "initial_vector": np.array([25] * PROBLEM_SPECS["fun_1"]["num_var"]),
+        "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_1"]["num_con"]),
+        "patience": 100,
         "delta": 0.000001,
-        "grad_iter_max": 25000,
+        "grad_iter_max": 5000,
         "C": 1
     },
     "fun_2": {
@@ -125,7 +127,7 @@ GRADIENT_SPECS = {
         "patience": 50,
         "delta": 0.000001,
         "grad_iter_max": 25000,
-        "C": 0.75
+        "C": 1000
     },
     "fun_4": {
         "initial_vector": [5] * PROBLEM_SPECS["fun_4"]["num_var"],
@@ -148,9 +150,9 @@ GRADIENT_SPECS = {
 
 EVAL_SPECS = {
     "fun_1": {"initial_vectors": [[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
-              "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]},
+              "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1]},
     "fun_2": {"initial_vectors": [[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
-              "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]},
+              "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1]},
     "fun_3": {"initial_vectors": [[50] * PROBLEM_SPECS["fun_3"]["num_var"], [25] * PROBLEM_SPECS["fun_3"]["num_var"],
                                   [20] * PROBLEM_SPECS["fun_3"]["num_var"], [10] * PROBLEM_SPECS["fun_3"]["num_var"],
                                   [5] * PROBLEM_SPECS["fun_3"]["num_var"], [0] * PROBLEM_SPECS["fun_3"]["num_var"]],

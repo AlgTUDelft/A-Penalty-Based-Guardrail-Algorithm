@@ -8,6 +8,34 @@ from pathlib import Path
 from optimization_specs import *
 from collections import OrderedDict
 
+
+def calculate_max_percent_f_and_q(f, q):
+    """
+    Calculate the largest constraint violation in percentage per algorithm's iteration
+    :param f: list[lists]]
+    :param q: list
+    :return: list
+    """
+    # Check for zeros in 'q'
+    if 0 in q:
+        raise ValueError("Division by zero encountered in 'q' array.")
+
+    # Check that all sublists in 'f' have the same length as 'q'
+    for sublist in f:
+        if len(sublist) != len(q):
+            raise ValueError("Sublists in 'f' must be the same length as 'q'.")
+
+    # Perform the operation
+    result = [
+        [(abs(elem) / q[j]) * 100 for j, elem in enumerate(sublist)]
+        for sublist in f
+    ]
+
+    result_max = [max(elem) for elem in result]
+
+    return result_max
+
+
 linestyles = OrderedDict(
     [('solid', (0, ())),
      ('loosely dotted', (0, (1, 10))),
@@ -101,7 +129,7 @@ def objective_value(num_con, T, opt_name, path, path_w, freq_s):
     plt.show()
 
 
-def constraint_violation(num_con, T, opt_name, path, path_w, freq_s):
+def constraint_violation(num_con, T, q, opt_name, path, path_w, freq_s):
     plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
@@ -111,8 +139,12 @@ def constraint_violation(num_con, T, opt_name, path, path_w, freq_s):
             data = data.iloc[::freq_elem, :]
         opts[opt] = {"runtime": data["runtime"].tolist(), "f": []}
         f = data["f"].tolist()
-        for i in range(len(f)):
-            opts[opt]["f"].append(abs(min(0, min(f[i]))))
+        #for i in range(len(f)):
+        #    opts[opt]["f"].append(abs(min(0, min(f[i]))))
+        f_array = np.array(f)
+        f_array[f_array >= 0] = 0
+        f = f_array.tolist()
+        opts[opt]["f"] = calculate_max_percent_f_and_q(f, q)
     # objective function
     # plt.figure(figsize=(10, 5))
     for opt in opt_name:
@@ -360,7 +392,8 @@ if __name__ == "__main__":
     objective_value(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
                     path_w=path_write,
                     freq_s=10)
-    constraint_violation(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
+    constraint_violation(num_con=problem_spec["num_con"], T=problem_spec["T"], q=problem_spec["q"], opt_name=opt_name,
+                         path=path_read,
                          path_w=path_write,
                          freq_s=10)
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
