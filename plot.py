@@ -56,7 +56,7 @@ linestyles = OrderedDict(
 
 visualization_spec = {
     "mps": {"color": "#36FF33", "marker": "s", "linestyle": "dotted", "label": "MPS", "markersize": 12},
-    "pm_lb": {"color": "#B6C800", "marker": "^", "linestyle": "dashed", "label": r"$PM_{C\searrow}$", "markersize": 12},
+    "pm_lb": {"color": "#B6C800", "marker": "^", "linestyle": "dashed", "label": "PM", "markersize": 12},
     "pm_ub": {"color": "#f119c3", "marker": "v", "linestyle": "dotted", "label": r"$PM_{C\nearrow}$", "markersize": 12},
     "ipdd": {"color": "#0d5915", "marker": "2", "linestyle": linestyles['densely dashed'],
              "label": "IPDD",
@@ -139,7 +139,7 @@ def constraint_violation(num_con, T, q, opt_name, path, path_w, freq_s):
             data = data.iloc[::freq_elem, :]
         opts[opt] = {"runtime": data["runtime"].tolist(), "f": []}
         f = data["f"].tolist()
-        #for i in range(len(f)):
+        # for i in range(len(f)):
         #    opts[opt]["f"].append(abs(min(0, min(f[i]))))
         f_array = np.array(f)
         f_array[f_array >= 0] = 0
@@ -382,13 +382,14 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
 
 
 if __name__ == "__main__":
-    function = "fun_3"
+    function = "fun_1"
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
     eval_spec = get_eval_spec(function)
     opt_name = ["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"]
+    """
     objective_value(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
                     path_w=path_write,
                     freq_s=10)
@@ -410,5 +411,6 @@ if __name__ == "__main__":
                                         freq_s=10)
     get_element_end_iteration(opt_name="pga", path=path_read.joinpath("initialization"),
                               initial_solutions=eval_spec["initial_vectors"])
-    parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[1, 0.75, 0.5, 0.25, 0.1, 0.01],
+    """
+    parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[10, 5, 1, 0.75, 0.5, 0.25],
                 path_r=path_read.joinpath("parameter_C"), path_w=path_write)

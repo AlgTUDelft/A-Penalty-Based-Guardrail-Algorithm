@@ -74,7 +74,7 @@ PROBLEM_SPECS = {"fun_1": {
     "num_var": 2,
     "c": [[1, 0], [1, 2], [1, 10]],
     "q": [1, 5],
-    "T": 200,
+    "T": 100,
     "ub": [float("inf")] * 2,
     "lb": [0] * 2
 }, "fun_2": {
@@ -111,7 +111,7 @@ GRADIENT_SPECS = {
         "patience": 100,
         "delta": 0.000001,
         "grad_iter_max": 5000,
-        "C": 1
+        "C": 0.5
     },
     "fun_2": {
         "initial_vector": [25, 25],
