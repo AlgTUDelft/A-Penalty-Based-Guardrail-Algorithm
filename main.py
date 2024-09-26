@@ -3,7 +3,7 @@ from algorithms import *
 from eval import *
 
 if __name__ == "__main__":
-    function = "fun_1"
+    function = "fun_5"
     path: Path = Path("data").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
@@ -67,7 +67,7 @@ if __name__ == "__main__":
                                                                   step_size=1,
                                                                   perturbation_term=0.9,
                                                                   beta=0.9, gamma=1)
-    save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path, name="gdpa_tf",
+    save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path, name="gdpa",
          vars=var_gdpa)
     J_pga, constraint_values_pga, var_pga, runtime_pga = pga(num_var=problem_spec["num_var"],
                                                              num_con=problem_spec["num_con"],

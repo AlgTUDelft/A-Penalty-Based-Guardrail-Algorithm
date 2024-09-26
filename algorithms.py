@@ -25,9 +25,10 @@ def mps(num_var, num_con, c, q, ub, lb, T):
     end = time.time()
     var = [m.getVal(x[i]) for i in range(num_var)]
     J = m.getVal(objvar)
-    constraint_values = get_constraint_values(var=var, num_var=num_var, num_con=num_con,
-                                              c=c,
-                                              q=q)
+    constraint_values = [
+        sum(c[i][j] * var[j] for j in range(num_var)) - q[i]
+        for i in range(num_con)
+    ]
     return [var], [J], [constraint_values], [end - start]
 
 
