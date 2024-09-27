@@ -138,13 +138,13 @@ GRADIENT_SPECS = {
         "C": 0.5
     },
     "fun_5": {
-        "initial_vector": get_initial_vector(initial_solution=[25] * PROBLEM_SPECS["fun_5"]["num_var"],
+        "initial_vector": get_initial_vector(initial_solution=[40] * PROBLEM_SPECS["fun_5"]["num_var"],
                                              problem_spec=PROBLEM_SPECS["fun_5"]),
         "initial_lambdas": [0] * PROBLEM_SPECS["fun_5"]["num_con"],
         "patience": 50,
         "delta": 0.000001,
         "grad_iter_max": 30000,
-        "C": 1
+        "C": 0.5
     }
 }
 

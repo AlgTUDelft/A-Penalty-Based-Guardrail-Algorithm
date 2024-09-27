@@ -84,7 +84,7 @@ if __name__ == "__main__":
     """
     determine_gradient_descent_iterations(problem_spec
                                           =problem_spec, grad_spec=grad_spec,
-                                          grad_iters=[30000, 50000, 100000, 200000, 500000],
+                                          grad_iters=[500000, 1000000],
                                           path=path.joinpath("gradient_descent_iterations"))
     """
     initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
