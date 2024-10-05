@@ -51,3 +51,11 @@ def P_x(var, ub, lb):
     """
     var = np.maximum(np.minimum(var, ub), lb)
     return var
+
+
+def determine_max_variable_mps(path):
+    data = pd.read_json(path)
+
+    vars = data["vars"].tolist()
+    vars = vars[0]
+    print(max(vars))
