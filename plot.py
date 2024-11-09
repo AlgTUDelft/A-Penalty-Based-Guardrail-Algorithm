@@ -381,7 +381,9 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     plt.show()
 
 
+
 if __name__ == "__main__":
+    """
     function = "fun_3"
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
@@ -396,7 +398,6 @@ if __name__ == "__main__":
                          path=path_read,
                          path_w=path_write, function_name=function,
                          freq_s=10)
-    """
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
                                                 opt_names_init=["mps", "pm_lb_init_25_25_25_25_25",
                                                                 "pm_ub_init_25_25_25_25_25",

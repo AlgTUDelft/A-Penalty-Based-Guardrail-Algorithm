@@ -1,0 +1,54 @@
+STATISTICS
+  Problem name     : MPS
+  Variables        : 15 (4 binary, 0 integer, 0 implicit integer, 11 continuous)
+  Constraints      : 0 initial, 30 maximal
+OBJECTIVE
+  Sense            : minimize
+VARIABLES
+  [binary] <elu_is_positive_0_0>: obj=0, original bounds=[0,1]
+  [binary] <elu_is_positive_0_1>: obj=0, original bounds=[0,1]
+  [binary] <elu_is_positive_0_2>: obj=0, original bounds=[0,1]
+  [binary] <elu_is_positive_1_0>: obj=0, original bounds=[0,1]
+  [continuous] <layer_0_neuron_2>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_1_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <elu_output_0_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <x(0)>: obj=0, original bounds=[-50,50]
+  [continuous] <elu_output_0_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <x(1)>: obj=0, original bounds=[-50,50]
+  [continuous] <elu_output_0_2>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <elu_output_1_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <J>: obj=1, original bounds=[-inf,+inf]
+CONSTRAINTS
+  [linear] <c1>:  +3<x(1)>[C] -1000<elu_is_positive_0_0>[B] <= 0;
+  [linear] <c2>:  +3<x(1)>[C] -1000<elu_is_positive_0_0>[B] >= -1000;
+  [linear] <c3>: <elu_output_0_0>[C] -3<x(1)>[C] >= 0;
+  [linear] <c4>: <elu_output_0_0>[C] -3<x(1)>[C] +1000<elu_is_positive_0_0>[B] <= 1000;
+  [nonlinear] <c5>: <elu_output_0_0>+((exp((<x(0)>*0+<x(1)>*3))+(-1))+<elu_is_positive_0_0>*(-1000))*(-1) >= 0;
+  [nonlinear] <c6>: <elu_output_0_0>+((exp((<x(0)>*0+<x(1)>*3))+(-1))+<elu_is_positive_0_0>*1000)*(-1) <= 0;
+  [linear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>[C] -<elu_output_0_0>[C] == 0;
+  [linear] <c8>: <x(0)>[C] +2<x(1)>[C] -1000<elu_is_positive_0_1>[B] <= 0;
+  [linear] <c9>: <x(0)>[C] +2<x(1)>[C] -1000<elu_is_positive_0_1>[B] >= -1000;
+  [linear] <c10>: <elu_output_0_1>[C] -<x(0)>[C] -2<x(1)>[C] >= 0;
+  [linear] <c11>: <elu_output_0_1>[C] -<x(0)>[C] -2<x(1)>[C] +1000<elu_is_positive_0_1>[B] <= 1000;
+  [nonlinear] <c12>: <elu_output_0_1>+((exp((<x(0)>+<x(1)>*2))+(-1))+<elu_is_positive_0_1>*(-1000))*(-1) >= 0;
+  [nonlinear] <c13>: <elu_output_0_1>+((exp((<x(0)>+<x(1)>*2))+(-1))+<elu_is_positive_0_1>*1000)*(-1) <= 0;
+  [linear] <layer_0_neuron_1_constraint>: <layer_0_neuron_1>[C] -<elu_output_0_1>[C] == 0;
+  [linear] <c15>:  +3<x(0)>[C] +<x(1)>[C] -1000<elu_is_positive_0_2>[B] <= 0;
+  [linear] <c16>:  +3<x(0)>[C] +<x(1)>[C] -1000<elu_is_positive_0_2>[B] >= -1000;
+  [linear] <c17>: <elu_output_0_2>[C] -3<x(0)>[C] -<x(1)>[C] >= 0;
+  [linear] <c18>: <elu_output_0_2>[C] -3<x(0)>[C] -<x(1)>[C] +1000<elu_is_positive_0_2>[B] <= 1000;
+  [nonlinear] <c19>: <elu_output_0_2>+((exp((<x(0)>*3+<x(1)>))+(-1))+<elu_is_positive_0_2>*(-1000))*(-1) >= 0;
+  [nonlinear] <c20>: <elu_output_0_2>+((exp((<x(0)>*3+<x(1)>))+(-1))+<elu_is_positive_0_2>*1000)*(-1) <= 0;
+  [linear] <layer_0_neuron_2_constraint>: <layer_0_neuron_2>[C] -<elu_output_0_2>[C] == 0;
+  [linear] <c22>:  +2<layer_0_neuron_0>[C] +<layer_0_neuron_1>[C] +<layer_0_neuron_2>[C] -1000<elu_is_positive_1_0>[B] <= 0;
+  [linear] <c23>:  +2<layer_0_neuron_0>[C] +<layer_0_neuron_1>[C] +<layer_0_neuron_2>[C] -1000<elu_is_positive_1_0>[B] >= -1000;
+  [linear] <c24>: <elu_output_1_0>[C] -2<layer_0_neuron_0>[C] -<layer_0_neuron_1>[C] -<layer_0_neuron_2>[C] >= 0;
+  [linear] <c25>: <elu_output_1_0>[C] -2<layer_0_neuron_0>[C] -<layer_0_neuron_1>[C] -<layer_0_neuron_2>[C] +1000<elu_is_positive_1_0>[B] <= 1000;
+  [nonlinear] <c26>: <elu_output_1_0>+((exp((<layer_0_neuron_0>*2+<layer_0_neuron_1>+<layer_0_neuron_2>))+(-1))+<elu_is_positive_1_0>*(-1000))*(-1) >= 0;
+  [nonlinear] <c27>: <elu_output_1_0>+((exp((<layer_0_neuron_0>*2+<layer_0_neuron_1>+<layer_0_neuron_2>))+(-1))+<elu_is_positive_1_0>*1000)*(-1) <= 0;
+  [linear] <layer_1_neuron_0_constraint>: <layer_1_neuron_0>[C] -<elu_output_1_0>[C] == 0;
+  [linear] <constraint(0)>: <layer_1_neuron_0>[C] >= 4;
+  [linear] <objective_function_constraint>: <J>[C] -<x(0)>[C] -2<x(1)>[C] >= 0;
+END

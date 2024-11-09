@@ -102,7 +102,8 @@ PROBLEM_SPECS = {"fun_1": {
     "ub": [float("inf")] * 2,
     "lb": [0] * 2
 }, "fun_5": large_linear_program(num_con=10000, num_var=10000,
-                                 path=Path("data/fun_5").joinpath("fun_5.pickle"))}
+                                 path=Path("data/fun_5").joinpath("fun_5.pickle"))
+}
 PROBLEM_SPECS["fun_5"]["T"] = 3600
 GRADIENT_SPECS = {
     "fun_1": {
@@ -163,7 +164,7 @@ EVAL_SPECS = {
     "fun_5": {"initial_vectors": [[100] * PROBLEM_SPECS["fun_4"]["num_var"], [75] * PROBLEM_SPECS["fun_4"]["num_var"],
                                   [50] * PROBLEM_SPECS["fun_4"]["num_var"], [25] * PROBLEM_SPECS["fun_4"]["num_var"]],
               "Cs": [100],
-              #"Cs":[100, 75, 50, 25, 10, 5, 1]
+              # "Cs":[100, 75, 50, 25, 10, 5, 1]
               }
 }
 
