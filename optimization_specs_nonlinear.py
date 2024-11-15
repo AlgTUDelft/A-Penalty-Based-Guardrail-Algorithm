@@ -16,15 +16,15 @@ PROBLEM_SPECS = {"fun_1": {
 "fun_2": {
     "num_var": 2,
     "num_con": 2,
-    "num_layers": [2,2],
+    "num_layers": [2, 2],
     "num_neuron_per_layer": [[3, 1], [2, 1]],
-    "activation_fun": [["tanh", "tanh"], ["sigmoid", "tanh"]],
-    "w": [[[[2, 1, 3], [0.4, 0.5, 0.2]], [[0.2], [0.1], [0.3]]], [[[0.1, 0.2], [0.3, 0.4]], [[0.1], [0.2]]]],
-    "c_obj": [1, 2],
-    "q": [2, 2],
-    "T": 1,
-    "ub": [float("inf")] * 2,
-    "lb": [0] * 2
+    "activation_fun": [["relu", "relu"], ["relu", "relu"]],
+    "w": [[[[2, 1, 3], [0, 5, 2]], [[1], [0.5], [2]]], [[[1, 2], [3, 4]], [[1], [2]]]],
+    "c_obj": [1, 10],
+    "q": [4, 6],
+    "T": 100,
+    "ub": [float(25)] * 2,
+    "lb": [-float(25)] * 2
 },
 "fun_3": {
     "num_var": 2,
@@ -67,12 +67,12 @@ GRADIENT_SPECS = {
         "rho": 1
     },
         "fun_2": {
-        "initial_vector": np.array([1] * PROBLEM_SPECS["fun_2"]["num_var"]),
+        "initial_vector": np.array([25] * PROBLEM_SPECS["fun_2"]["num_var"]),
         "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_2"]["num_con"]),
         "patience": 100,
         "delta": 0.000001,
-        "grad_iter_max": 10,
-        "C": 1,
+        "grad_iter_max": 5000,
+        "C": 20,
         "rho": 1
     },
     "fun_3": {

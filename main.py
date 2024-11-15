@@ -3,13 +3,12 @@ from algorithms import *
 from eval import *
 
 if __name__ == "__main__":
-    function = "fun_5"
-    path: Path = Path("data").joinpath(function)
+    function = "fun_1"
+    path: Path = Path("data").joinpath("fun_1_negative_lower_bound")
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
     eval_spec = get_eval_spec(function)
     mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
-    """
     var_mps, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
                                                              num_con=problem_spec["num_con"], c=problem_spec["c"],
                                                              q=problem_spec["q"],
@@ -81,12 +80,13 @@ if __name__ == "__main__":
                                                              patience=grad_spec["patience"],
                                                              grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga", vars=var_pga)
+    """
     determine_gradient_descent_iterations(problem_spec
                                           =problem_spec, grad_spec=grad_spec,
                                           grad_iters=[500000, 1000000],
                                           path=path.joinpath("gradient_descent_iterations"))
     initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
                    path=path.joinpath("initialization"))
-    """
     parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
                 path=path.joinpath("parameter_C"))
+    """

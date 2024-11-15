@@ -1,3 +1,6 @@
+import wandb
+# from wandb.integration.keras import WandbMetricsLogger, WandbModelCheckpoint
+
 from pyscipopt import Model, quicksum, multidict, exp
 import tensorflow as tf
 import numpy as np
@@ -6,6 +9,7 @@ import math
 from pathlib import Path
 from optimization_specs_nonlinear import *
 from helpers import *
+from plot_nonlinear import *
 
 
 def sigmoid(x):
@@ -98,15 +102,15 @@ def exponential(x):
 
 
 def compile_nn(
-    m,
-    order_constraint,
-    num_var,
-    x,
-    num_layers,
-    neurons_per_layer,
-    weights,
-    activations,
-    q,
+        m,
+        order_constraint,
+        num_var,
+        x,
+        num_layers,
+        neurons_per_layer,
+        weights,
+        activations,
+        q,
 ):
     layer_output = []
     # Loop through each layer and initialize an empty list for neurons in each layer
@@ -276,7 +280,7 @@ def mps(problem_specs):
 
 
 def get_constraint_values(
-    var, w, q, activations, gdpa_coeff_w=1, gdpa_coeff_q=1
+        var, w, q, activations, gdpa_coeff_w=1, gdpa_coeff_q=1
 ) -> np.ndarray:
     var = tf.constant(var, dtype=tf.float32)
     q = tf.constant(q, dtype=tf.float32)
@@ -306,7 +310,7 @@ def get_constraint_values(
     q = tf.squeeze(q)  # Ensure q is 1D
 
     constraint_values = (
-        gdpa_coeff_w * x - gdpa_coeff_q * q
+            gdpa_coeff_w * x - gdpa_coeff_q * q
     )  # Positive values indicate satisfied constraints
 
     return np.atleast_1d(constraint_values.numpy())
@@ -442,8 +446,8 @@ def calculate_gradient_lagrangian_fun(var, c_obj, w, activations, q, rho, lambda
 
 
 def ipdd(
-    problem_specs,
-    grad_specs,
+        problem_specs,
+        grad_specs,
 ):
     print("IPDD")
     Js, constraint_values, solutions, runtimes = [], [], [], [0]
@@ -596,12 +600,12 @@ def gdpa(problem_specs, grad_specs, step_size, perturbation_term, beta, gamma):
         )
         constraint_values_prev = tf.constant(constraint_values_prev, dtype=tf.float32)
         tau_beta = (
-            beta * constraint_values_prev + (1 - perturbation_term) * lambdas_prev
+                beta * constraint_values_prev + (1 - perturbation_term) * lambdas_prev
         )
 
         tau_beta_nonnegative = tf.maximum(tau_beta, 0)
         solution = solution_prev - step_size * (
-            delta_J + tf.tensordot(Jacobian, tau_beta_nonnegative, axes=1)
+                delta_J + tf.tensordot(Jacobian, tau_beta_nonnegative, axes=1)
         )
         solution = tf.clip_by_value(solution, lb, ub)
         # second equationS_r = [i for i in range(num_con) if tau_beta[i] > 0]
@@ -673,13 +677,11 @@ def pga(problem_specs, grad_specs):
         # at each new iteration of outer loop, reset gradient iterations and patience counter.
         grad_iter = 0
         var = tf.Variable(grad_specs["initial_vector"], dtype=tf.float32)
-        tf.print("var ", var)
         opt = tf.keras.optimizers.Adam(learning_rate=0.01)
         start_time = time.time()
         q_pga = tf.constant(
             [np.float32(epsilon[i] + x) for i, x in enumerate(q)], dtype=tf.float32
         )
-        tf.print("q ", q_pga)
         while grad_iter < grad_iter_max:
             grads = calculate_gradient_penalty_fun(
                 var=var, c_obj=c_obj, w=w, q=q_pga, activations=activations, C=C
@@ -695,7 +697,6 @@ def pga(problem_specs, grad_specs):
         constraint_value = get_constraint_values(
             var=var_np, w=w, q=q, activations=activations
         )
-        print("constraint value ", constraint_value)
         # update epsilon
         epsilon = [
             np.float32(
@@ -703,7 +704,6 @@ def pga(problem_specs, grad_specs):
             )
             for i, eps in enumerate(epsilon)
         ]
-        print("epsilon ", epsilon)
         # append outer iteration results
         variables.append(var_np.tolist())
         Js.append(J)
@@ -713,10 +713,16 @@ def pga(problem_specs, grad_specs):
 
 
 if __name__ == "__main__":
-    function = "fun_1"
-    path: Path = Path("data/nonlinear").joinpath(function)
+    function = "fun_2"
+    path: Path = Path("data/nonlinear").joinpath("fun_2")
     problem_spec = PROBLEM_SPECS[function]
     grad_spec = GRADIENT_SPECS[function]
+    wandb.init(
+        project="nonlinear_optimization",
+        config={**problem_spec, **grad_spec},
+        # Optional: add a name for this run
+        name=f"optimization_run_{time.strftime('%Y%m%d_%H%M%S')}"
+    )
     mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = (
         {},
         {},
@@ -725,20 +731,18 @@ if __name__ == "__main__":
         {},
         {},
     )
-    """
     J_mps, constraint_values_mps, var_mps, runtime_mps = mps(problem_specs=problem_spec)
     save(dict_=mps_dict, J=J_mps, f=constraint_values_mps, runtime=runtime_mps, path=path, name="mps", vars=var_mps)
     J_pm_lb, constraint_values_pm_lb, var_pm_lb, runtime_pm_lb = standard_penalty_alg(
-        problem_specs=problem_spec, grad_specs=grad_spec, C = grad_spec["C"]
+        problem_specs=problem_spec, grad_specs=grad_spec, C=grad_spec["C"]
     )
     save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path=path,
          name="pm_lb", vars=var_pm_lb)
     J_pm_ub, constraint_values_pm_ub, var_pm_ub, runtime_pm_ub = standard_penalty_alg(
-        problem_specs=problem_spec, grad_specs=grad_spec, C=100
+        problem_specs=problem_spec, grad_specs=grad_spec, C=1000
     )
     save(dict_=pm_ub_dict, J=J_pm_ub, f=constraint_values_pm_ub, runtime=runtime_pm_ub, path=path,
          name="pm_ub", vars=var_pm_ub)
-
     J_ipdd, constraint_values_ipdd, var_ipdd, runtime_ipdd = ipdd(
         problem_specs=problem_spec, grad_specs=grad_spec
     )
@@ -755,9 +759,12 @@ if __name__ == "__main__":
     )
     save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path,
          name="gdpa", vars=var_gdpa)
-    """
     J_pga, constraint_values_pga, var_pga, runtime_pga = pga(
         problem_specs=problem_spec, grad_specs=grad_spec
     )
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path,
          name="pga", vars=var_pga)
+    wandb_login(save_path=Path("plots/nonlinear").joinpath("fun_2"),
+                runtimes={"mps": runtime_mps, "pm_lb": runtime_pm_lb, "pm_ub": runtime_pm_ub, "ipdd": runtime_ipdd, "gdpa":runtime_gdpa, "pga": runtime_pga},
+                objectives={"mps": J_mps, "pm_lb": J_pm_lb, "pm_ub": J_pm_ub, "ipdd": J_ipdd, "gdpa": J_gdpa, "pga": J_pga}, T = problem_spec["T"])
+    wandb.finish()
