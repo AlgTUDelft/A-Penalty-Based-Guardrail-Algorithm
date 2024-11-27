@@ -1,10 +1,12 @@
 import wandb
 import matplotlib.pyplot as plt
+import time
 import numpy as np
 import pandas as pd
 from pathlib import Path
-
 from collections import OrderedDict
+
+from optimization_specs_nonlinear import *
 
 linestyles = OrderedDict(
     [('solid', (0, ())),
@@ -32,47 +34,256 @@ visualization_spec = {
              "label": "IPDD",
              "markersize": 15},
     "gdpa": {"color": "#E31D1D", "marker": "o", "linestyle": "dashdot", "label": "GDPA", "markersize": 7},
-    "pga": {"color": "#1c24dc", "marker": "*", "linestyle": "solid", "label": "PGA", "markersize": 10}}
+    "pga": {"color": "#1c24dc", "marker": "*", "linestyle": "solid", "label": "PGA", "markersize": 10},
+    "pm": {"color": "#B6C800", "marker": "^", "linestyle": "dashed", "label": "PM", "markersize": 12}}
 
 
-def wandb_login(save_path, runtimes, objectives, T):
+def objective_value(path_r, path_w, T, opt_name, function_name, freq_s):
+    # setting KMP_DUPLICATE_LIB_OK=TRUE is used to prevent the error: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
+    # this environment variable is set only after program execution in order to avoid interfering with this execution.
+    # import os
+    # os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
     # Plot using Matplotlib
+    opts = {}
+    for opt in opt_name:
+        data = pd.read_json(path_r.joinpath(opt + ".json"))
+        data = data.dropna(subset=['J'])
+        freq_elem = int(len(data) / (T / freq_s))
+        if freq_elem > 0:
+            data = data.iloc[::freq_elem, :]
+        opts[opt] = data
     plt.figure(figsize=(8, 6))
-    for key in runtimes.keys():
-        plt.plot(runtimes[key], objectives[key], label=visualization_spec[key]["label"],
-                 color=visualization_spec[key]["color"], linestyle=visualization_spec[key]["linestyle"],
-                 marker=visualization_spec[key]["marker"], markersize=visualization_spec[key]["markersize"])
-        if key in ["mps", "pm_lb", "pm_ub"]:
+    for opt in opt_name:
+        plt.plot(
+            opts[opt]["runtime"],
+            opts[opt]["J"],
+            color=visualization_spec[opt]["color"],
+            marker=visualization_spec[opt]["marker"],
+            linestyle=visualization_spec[opt]["linestyle"],
+            label=visualization_spec[opt]["label"],
+            markersize=visualization_spec[opt]["markersize"],
+        )
+        if opt in ["mps", "pm_lb", "pm_ub"]:
             plt.axhline(
-                y=objectives[key][0],
-                xmin=runtimes[key][0] / (T),
+                y=opts[opt]["J"][0],
+                xmin=opts[opt]["runtime"][0] / (T),
                 xmax=1,
-                color=visualization_spec[key]["color"],
-                linestyle=visualization_spec[key]["linestyle"], )
+                color=visualization_spec[opt]["color"],
+                linestyle=visualization_spec[opt]["linestyle"], )
     plt.xlim([0, T])
-    plt.xlabel("Runtime")
-    plt.ylabel("Objective")
-    plt.title("Objective Values vs Runtime")
+    # plt.ylim([lower_bound, upper_bound])
+    # plt.yscale("log")
     plt.legend()
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Objective value", fontsize=14)
     plt.grid()
 
-    objective_save_path = save_path.joinpath("objectives_scatter.png")
+    path_w_png = path_w.joinpath("objective_value_" + function_name + ".png")
+    path_w_svg = path_w.joinpath("objective_value_" + function_name + ".svg")
     # Log the plot to Weights & Biases
-    plt.savefig(objective_save_path)
+    plt.savefig(path_w_png)
+    plt.savefig(path_w_svg)
     plt.close()
+
+    j_values = {method: list(df["J"]) for method, df in opts.items()}
+    runtime_values = {method: list(df["runtime"]) for method, df in opts.items()}
 
     table = wandb.Table(
         data=[
             [method, obj, runtime]
             for method, (obj, runtime) in zip(
-                objectives.keys(),
-                zip(objectives.values(), runtimes.values())
+                opts.keys(),
+                zip(j_values.values(), runtime_values.values())
             )
         ],
         columns=["method", "objective", "runtime"]
     )
 
     wandb.log({
-        "objectives_scatter": wandb.Image(str(objective_save_path)),
-        "results_table": table,
+        "objective_value": wandb.Image(str(path_w_png)),
+        "results_table_objective_value": table,
     })
+
+
+def constraint_violation(path_r, path_w, T, opt_name, function_name, freq_s):
+    plt.figure(figsize=(8, 6))
+    constraints_der = {opt: [] for opt in opt_name}
+    runtimes = {opt: [] for opt in opt_name}
+    for opt in opt_name:
+        data = pd.read_json(path_r.joinpath(opt + ".json"))
+        data = data.dropna(subset=['J'])
+        freq_elem = int(len(data) / (T / freq_s))
+        if freq_elem > 0:
+            data = data.iloc[::freq_elem, :]
+        data_constraint = list(data["f"])
+        runtimes[opt] = list(data["runtime"])
+        for i in range(len(data_constraint)):
+            constraints_der[opt].append(abs(min(0, min(data_constraint[i]))))
+    for key in opt_name:
+        plt.plot(runtimes[key], constraints_der[key], label=visualization_spec[key]["label"],
+                 color=visualization_spec[key]["color"], linestyle=visualization_spec[key]["linestyle"],
+                 marker=visualization_spec[key]["marker"], markersize=visualization_spec[key]["markersize"])
+        if key in ["mps", "pm_lb", "pm_ub"]:
+            plt.axhline(
+                y=constraints_der[key][0],
+                xmin=runtimes[key][0] / (T),
+                xmax=1,
+                color=visualization_spec[key]["color"],
+                linestyle=visualization_spec[key]["linestyle"], )
+    plt.xlim([0, T])
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Constraint violation", fontsize=14)
+    plt.legend()
+    plt.grid()
+    plt.xlim([0, T])
+    # plt.yscale("log")
+    # plt.ylim([lower_bound, upper_bound])
+    path_w_png = path_w.joinpath("constraint_violations_" + function_name + ".png")
+    path_w_svg = path_w.joinpath("constraint_violations_" + function_name + ".svg")
+    # Log the plot to Weights & Biases
+    plt.savefig(path_w_png)
+    plt.savefig(path_w_svg)
+    plt.close()
+
+    table = wandb.Table(
+        data=[
+            [method, cons, runtime]
+            for method, (cons, runtime) in zip(
+                constraints_der.keys(),
+                zip(constraints_der.values(), runtimes.values())
+            )
+        ],
+        columns=["method", "constraint_violations", "runtime"]
+    )
+
+    wandb.log({
+        "constraint_violations": wandb.Image(str(path_w_png)),
+        "results_table_constraint_violations": table,
+    })
+
+
+def parameter_C(opt_names, T, Cs, path_r, path_w):
+    # Define colors and styles
+    opts = ["#36FF33", "#B6C800", "#f119c3", "#0d5915", "#E31D1D", "#1c24dc"]
+    if len(opts) < len(Cs):
+        raise ValueError("The number of parameters C must be at least equal to the number of C values.")
+    colors = {}
+    for i, C in enumerate(Cs):
+        colors[str(C)] = opts[i]
+    styles = {
+        'pm': {'linestyle': '--', 'marker': 'o', "markersize": 7},
+        'pga': {'linestyle': '-', 'marker': '*', "markersize": 10}
+    }
+
+    plt.figure(figsize=(12, 6))
+
+    # First set of lines for C values
+    for C in Cs:
+        for opt_name in opt_names:
+            filename = f"{opt_name}_{C}.json"
+            filepath = path_r.joinpath(filename)
+
+            data = pd.read_json(filepath)
+
+            plt.plot(data["runtime"], data["J"],
+                     color=colors[str(C)],
+                     **styles[opt_name])
+            if opt_name == "pm":
+                plt.axhline(
+                    y=data["J"][0],
+                    xmin=data["runtime"][0] / (T),
+                    xmax=1,
+                    color=colors[str(C)],
+                    linestyle=styles[opt_name]["linestyle"])
+
+    # Create legend for C values
+    C_legend = [plt.Line2D([0], [0], color=colors[str(C)], lw=2, label=f'C={C}') for C in Cs]
+
+    # Create legend for optimizers
+    opt_legend = [plt.Line2D([0], [0], **styles[opt], color='black', label=visualization_spec[opt]["label"]) for opt in
+                  opt_names]
+
+    # Add C values legend
+    first_legend = plt.legend(handles=C_legend, title='C values', loc='upper left')
+    plt.gca().add_artist(first_legend)
+
+    # Add Optimizers legend
+    plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
+
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Objective value", fontsize=14)
+    plt.xlim([0, T])
+    plt.grid()
+    plt.savefig(path_w.joinpath("objective_value_parameter_C.svg"), format='svg')
+    plt.show()
+
+    plt.figure(figsize=(12, 6))
+
+    # First set of lines for C values
+    for C in Cs:
+        for opt_name in opt_names:
+            filename = f"{opt_name}_{C}.json"
+            filepath = path_r.joinpath(filename)
+
+            data = pd.read_json(filepath)
+            constraint_violations = []
+            f = data["f"].tolist()
+            for i in range(len(f)):
+                constraint_violations.append(abs(min(0, min(f[i]))))
+
+            plt.plot(data["runtime"], constraint_violations,
+                     color=colors[str(C)],
+                     **styles[opt_name])
+            if opt_name == "pm":
+                plt.axhline(
+                    y=constraint_violations[0],
+                    xmin=data["runtime"][0] / (T),
+                    xmax=1,
+                    color=colors[str(C)],
+                    linestyle=styles[opt_name]["linestyle"])
+
+    # Create legend for C values
+    C_legend = [plt.Line2D([0], [0], color=colors[str(C)], lw=2, label=f'C={C}') for C in Cs]
+
+    # Create legend for optimizers
+    opt_legend = [plt.Line2D([0], [0], **styles[opt], color='black', label=visualization_spec[opt]["label"]) for opt in
+                  opt_names]
+
+    # Add C values legend
+    first_legend = plt.legend(handles=C_legend, title='C values', loc='upper left')
+    plt.gca().add_artist(first_legend)
+
+    # Add Optimizers legend
+    plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
+
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlim([0, T])
+    plt.grid()
+    plt.savefig(path_w.joinpath("constraint_violations_parameter_C.svg"), format='svg')
+    plt.show()
+
+
+if __name__ == "__main__":
+    function = "fun_2"
+    problem_spec = PROBLEM_SPECS[function]
+    grad_spec = GRADIENT_SPECS[function]
+    eval_spec = EVAL_SPECS[function]
+    wandb.init(
+        project="nonlinear_optimization",
+        config={**problem_spec, **grad_spec},
+        # Optional: add a name for this run
+        name=f"optimization_run_{time.strftime('%Y%m%d_%H%M%S')}"
+    )
+    parameter_C(opt_names=["pm", "pga"], T=problem_spec["T"], Cs=eval_spec["Cs"],
+                path_r=Path("data/nonlinear").joinpath(function).joinpath("parameter_C"),
+                path_w=Path("data/nonlinear").joinpath(function))
+    """
+    objective_value(path_r=Path("data/nonlinear").joinpath(function),
+                    path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
+                    opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
+    constraint_violation(path_r=Path("data/nonlinear").joinpath(function),
+                    path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
+                    opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
+    """
+    wandb.finish()

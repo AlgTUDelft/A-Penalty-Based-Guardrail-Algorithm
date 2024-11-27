@@ -18,10 +18,10 @@ PROBLEM_SPECS = {"fun_1": {
     "num_con": 2,
     "num_layers": [2, 2],
     "num_neuron_per_layer": [[3, 1], [2, 1]],
-    "activation_fun": [["relu", "relu"], ["relu", "relu"]],
-    "w": [[[[2, 1, 3], [0, 5, 2]], [[1], [0.5], [2]]], [[[1, 2], [3, 4]], [[1], [2]]]],
+    "activation_fun": [["relu", "relu"], ["elu", "relu"]],
+    "w": [[[[2, 1, 3], [0, 5, 2]], [[1], [5], [2]]], [[[1, 2], [3, 4]], [[5], [4]]]],
     "c_obj": [1, 10],
-    "q": [4, 6],
+    "q": [4, 16],
     "T": 100,
     "ub": [float(25)] * 2,
     "lb": [-float(25)] * 2
@@ -72,7 +72,7 @@ GRADIENT_SPECS = {
         "patience": 100,
         "delta": 0.000001,
         "grad_iter_max": 5000,
-        "C": 20,
+        "C": 0.1,
         "rho": 1
     },
     "fun_3": {
@@ -94,3 +94,10 @@ GRADIENT_SPECS = {
         "rho": 1
     }
     }
+
+EVAL_SPECS = {
+    "fun_2": {"initial_vectors": [[25] * PROBLEM_SPECS["fun_2"]["num_var"],
+                                  [20] * PROBLEM_SPECS["fun_2"]["num_var"], [10] * PROBLEM_SPECS["fun_2"]["num_var"],
+                                  ],
+              "Cs": [5, 1, 0.5, 0.25, 0.1, 0.01]},
+}

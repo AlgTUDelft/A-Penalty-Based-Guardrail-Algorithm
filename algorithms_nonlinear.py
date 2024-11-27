@@ -1,15 +1,7 @@
-import wandb
-# from wandb.integration.keras import WandbMetricsLogger, WandbModelCheckpoint
-
 from pyscipopt import Model, quicksum, multidict, exp
 import tensorflow as tf
-import numpy as np
 import time
-import math
-from pathlib import Path
-from optimization_specs_nonlinear import *
 from helpers import *
-from plot_nonlinear import *
 
 
 def sigmoid(x):
@@ -22,77 +14,89 @@ def tanh(x):
     return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
 
 
-def relu(m, neuron_input, i, j):
+def relu(m, neuron_input, i, j, M=10000):
     """Rectified Linear Unit (ReLU) activation function."""
-    neuron_output = m.addVar(name=f"relu_output_{i}_{j}", lb=0.0, ub=float("+inf"))
-    positive_part = m.addVar(
-        name=f"relu_positive_part_{i}_{j}", lb=0.0, ub=float("+inf")
-    )
-    negative_part = m.addVar(name=f"relu_negative_part_{i}_{j}", lb=0.0, ub=0.0)
-    m.addCons(positive_part == neuron_input)
-    m.addCons(negative_part == 0.0)
-    m.addCons(neuron_output == positive_part + negative_part)
+    # Create binary variable for activation status
+    is_active = m.addVar(name=f"relu_active_{i}_{j}", vtype="B")
+
+    # Create output variable (always non-negative)
+    neuron_output = m.addVar(name=f"relu_output_{i}_{j}", lb=0.0)
+
+    # ReLU constraints
+    m.addCons(neuron_input <= M * is_active)
+    m.addCons(neuron_input >= -M * (1 - is_active))
+
+    m.addCons(neuron_output >= neuron_input)
+    m.addCons(neuron_output <= neuron_input + M * (1 - is_active))
+
+    m.addCons(neuron_output >= 0)
+    m.addCons(neuron_output <= M * is_active)
+
     return m, neuron_output
 
 
-def leaky_relu(m, neuron_input, i, j, alpha=0.01, M=1000):
+def leaky_relu(m, neuron_input, i, j, alpha=0.01, M=10000):
     """Leaky rectified linear unit (LeakyReLU) activation function."""
     neuron_output = m.addVar(
         name=f"leaky_relu_output_{i}_{j}", lb=float("-inf"), ub=float("+inf")
     )
 
     # Auxiliary binary variable to handle the piecewise function
-    is_positive = m.addVar(name=f"leaky_relu_is_positive_{i}_{j}", vtype="BINARY")
+    is_active = m.addVar(name=f"leaky_relu_is_positive_{i}_{j}", vtype="BINARY")
 
     # Constraints to implement LeakyReLU
-    m.addCons(neuron_input <= M * is_positive)
-    m.addCons(neuron_input >= -M * (1 - is_positive))
+    m.addCons(neuron_input <= M * is_active)
+    m.addCons(neuron_input >= -M * (1 - is_active))
 
     m.addCons(neuron_output >= neuron_input)
-    m.addCons(neuron_output <= neuron_input + M * (1 - is_positive))
+    m.addCons(neuron_output <= neuron_input + M * (1 - is_active))
 
-    m.addCons(neuron_output >= alpha * neuron_input - M * is_positive)
-    m.addCons(neuron_output <= alpha * neuron_input + M * is_positive)
+    m.addCons(neuron_output >= alpha * neuron_input - M * is_active)
+    m.addCons(neuron_output <= alpha * neuron_input + M * is_active)
 
     return m, neuron_output
 
 
-def elu(m, neuron_input, i, j, alpha=1, M=1000):
+def elu(m, neuron_input, i, j, alpha=1, M=10000):
     """Exponential linear unit (ELU) activation function."""
     neuron_output = m.addVar(
         name=f"elu_output_{i}_{j}", lb=float("-inf"), ub=float("+inf")
     )
 
     # Auxiliary binary variable to handle the piecewise function
-    is_positive = m.addVar(name=f"elu_is_positive_{i}_{j}", vtype="BINARY")
+    is_active = m.addVar(name=f"elu_is_positive_{i}_{j}", vtype="BINARY")
 
     # Constraints to implement ELU
-    m.addCons(neuron_input <= M * is_positive)
-    m.addCons(neuron_input >= -M * (1 - is_positive))
+    m.addCons(neuron_input <= M * is_active)
+    m.addCons(neuron_input >= -M * (1 - is_active))
 
     m.addCons(neuron_output >= neuron_input)
-    m.addCons(neuron_output <= neuron_input + M * (1 - is_positive))
+    m.addCons(neuron_output <= neuron_input + M * (1 - is_active))
 
-    m.addCons(neuron_output >= alpha * (exp(neuron_input) - 1) - M * is_positive)
-    m.addCons(neuron_output <= alpha * (exp(neuron_input) - 1) + M * is_positive)
+    m.addCons(neuron_output >= alpha * (exp(neuron_input) - 1) - M * is_active)
+    m.addCons(neuron_output <= alpha * (exp(neuron_input) - 1) + M * is_active)
 
     return m, neuron_output
 
 
-def selu(m, neuron_input, i, j, alpha=1.67326, lambda_=1.0507):
+def selu(m, neuron_input, i, j, alpha=1.67326, lambda_=1.0507, M=10000):
     """Scaled exponential linear unit (ELU) activation function."""
     neuron_output = m.addVar(
         name=f"selu_output_{i}_{j}", lb=float("-inf"), ub=float("+inf")
     )
-    positive_part = m.addVar(
-        name=f"selu_positive_part_{i}_{j}", lb=0.0, ub=float("+inf")
-    )
-    negative_part = m.addVar(
-        name=f"selu_negative_part_{i}_{j}", lb=float("-inf"), ub=0.0
-    )
-    m.addCons(positive_part == lambda_ * neuron_input)
-    m.addCons(negative_part == lambda_ * alpha * (exp(neuron_input) - 1))
-    m.addCons(neuron_output == positive_part + negative_part)
+
+    # Auxiliary binary variable to handle the piecewise function
+    is_active = m.addVar(name=f"selu_is_positive_{i}_{j}", vtype="BINARY")
+
+    # Constraints to implement ELU
+    m.addCons(neuron_input <= M * is_active)
+    m.addCons(neuron_input >= -M * (1 - is_active))
+
+    m.addCons(neuron_output >= lambda_ * neuron_input)
+    m.addCons(neuron_output <= lambda_ * neuron_input + M * (1 - is_active))
+
+    m.addCons(neuron_output >= lambda_ * alpha * (exp(neuron_input) - 1) - M * is_active)
+    m.addCons(neuron_output <= lambda_ * alpha * (exp(neuron_input) - 1) + M * is_active)
     return m, neuron_output
 
 
@@ -153,7 +157,7 @@ def compile_nn(
                     )
                 elif activation == "elu":
                     m, neuron_output = elu(
-                        m=m, neuron_input=neuron_input, i=i, j=j, alpha=1, M=1000
+                        m=m, neuron_input=neuron_input, i=i, j=j, alpha=1
                     )
                 elif activation == "selu":
                     m, neuron_output = selu(
@@ -191,7 +195,7 @@ def compile_nn(
                     )
                 elif activation == "elu":
                     m, neuron_output = elu(
-                        m=m, neuron_input=neuron_input, i=i, j=j, alpha=1, M=1000
+                        m=m, neuron_input=neuron_input, i=i, j=j, alpha=1
                     )
                 elif activation == "selu":
                     m, neuron_output = selu(
@@ -235,6 +239,7 @@ def mps(problem_specs):
     # Create Model
     m = Model("MPS")
     m.resetParams()
+    # m.setRealParam("numerics/feastol", 1e-03)
     m.setRealParam("limits/time", problem_specs["T"])
 
     # Decision Variables
@@ -242,7 +247,6 @@ def mps(problem_specs):
     layer_outputs = []
     # Constraint compilation
     for i in range(num_con):
-        print("i", weights[i])
         m, layer_output = compile_nn(
             m=m,
             order_constraint=i,
@@ -651,7 +655,7 @@ def gdpa(problem_specs, grad_specs, step_size, perturbation_term, beta, gamma):
     return Js, constraint_values_, solutions, runtimes[1:]
 
 
-def pga(problem_specs, grad_specs):
+def pga(problem_specs, grad_specs, C):
     print("PGA")
     Js, constraint_values, variables, runtimes = [], [], [], [0]
     epsilon = [0] * problem_specs["num_con"]
@@ -668,7 +672,7 @@ def pga(problem_specs, grad_specs):
     ub = tf.constant(problem_specs["ub"], dtype=tf.float32)
     activations = problem_specs["activation_fun"]
 
-    C = grad_specs["C"]
+    C = C
 
     grad_iter_max = grad_specs["grad_iter_max"]
     outer_iter = 0
@@ -712,59 +716,3 @@ def pga(problem_specs, grad_specs):
     return Js, constraint_values, variables, runtimes[1:]
 
 
-if __name__ == "__main__":
-    function = "fun_2"
-    path: Path = Path("data/nonlinear").joinpath("fun_2")
-    problem_spec = PROBLEM_SPECS[function]
-    grad_spec = GRADIENT_SPECS[function]
-    wandb.init(
-        project="nonlinear_optimization",
-        config={**problem_spec, **grad_spec},
-        # Optional: add a name for this run
-        name=f"optimization_run_{time.strftime('%Y%m%d_%H%M%S')}"
-    )
-    mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = (
-        {},
-        {},
-        {},
-        {},
-        {},
-        {},
-    )
-    J_mps, constraint_values_mps, var_mps, runtime_mps = mps(problem_specs=problem_spec)
-    save(dict_=mps_dict, J=J_mps, f=constraint_values_mps, runtime=runtime_mps, path=path, name="mps", vars=var_mps)
-    J_pm_lb, constraint_values_pm_lb, var_pm_lb, runtime_pm_lb = standard_penalty_alg(
-        problem_specs=problem_spec, grad_specs=grad_spec, C=grad_spec["C"]
-    )
-    save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path=path,
-         name="pm_lb", vars=var_pm_lb)
-    J_pm_ub, constraint_values_pm_ub, var_pm_ub, runtime_pm_ub = standard_penalty_alg(
-        problem_specs=problem_spec, grad_specs=grad_spec, C=1000
-    )
-    save(dict_=pm_ub_dict, J=J_pm_ub, f=constraint_values_pm_ub, runtime=runtime_pm_ub, path=path,
-         name="pm_ub", vars=var_pm_ub)
-    J_ipdd, constraint_values_ipdd, var_ipdd, runtime_ipdd = ipdd(
-        problem_specs=problem_spec, grad_specs=grad_spec
-    )
-    save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path=path,
-         name="ipdd", vars=var_ipdd)
-    
-    J_gdpa, constraint_values_gdpa, var_gdpa, runtime_gdpa = gdpa(
-        problem_specs=problem_spec,
-        grad_specs=grad_spec,
-        step_size=1,
-        perturbation_term=0.9,
-        beta=0.9,
-        gamma=1,
-    )
-    save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path,
-         name="gdpa", vars=var_gdpa)
-    J_pga, constraint_values_pga, var_pga, runtime_pga = pga(
-        problem_specs=problem_spec, grad_specs=grad_spec
-    )
-    save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path,
-         name="pga", vars=var_pga)
-    wandb_login(save_path=Path("plots/nonlinear").joinpath("fun_2"),
-                runtimes={"mps": runtime_mps, "pm_lb": runtime_pm_lb, "pm_ub": runtime_pm_ub, "ipdd": runtime_ipdd, "gdpa":runtime_gdpa, "pga": runtime_pga},
-                objectives={"mps": J_mps, "pm_lb": J_pm_lb, "pm_ub": J_pm_ub, "ipdd": J_ipdd, "gdpa": J_gdpa, "pga": J_pga}, T = problem_spec["T"])
-    wandb.finish()
