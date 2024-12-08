@@ -4,7 +4,7 @@ from pathlib import Path
 from algorithms_nonlinear import mps, standard_penalty_alg, ipdd, gdpa, pga
 from helpers import save
 from optimization_specs_nonlinear import *
-from eval_nonlinear import parameter_C
+from eval_nonlinear import parameter_C, initialization
 
 if __name__ == "__main__":
     function = "fun_2"
@@ -54,6 +54,8 @@ if __name__ == "__main__":
     )
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path,
          name="pga", vars=var_pga)
-    """
     parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
                 path=path.joinpath("parameter_C"))
+    """
+    initialization(problem_spec=problem_spec, grad_spec=grad_spec, initial_vectors=eval_spec["initial_vectors"],
+                   path=path.joinpath("initialization"))

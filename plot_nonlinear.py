@@ -37,6 +37,46 @@ visualization_spec = {
     "pga": {"color": "#1c24dc", "marker": "*", "linestyle": "solid", "label": "PGA", "markersize": 10},
     "pm": {"color": "#B6C800", "marker": "^", "linestyle": "dashed", "label": "PM", "markersize": 12}}
 
+visualization_spec_init = {
+    "mps": {"color": "#36FF33", "marker": "s", "linestyle": "solid", "label": r"$MPS(\mathbf{x}^0_{max})$",
+            "markersize": 12},
+    "pm_lb_init_25_25": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
+                         "label": r"$PM_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 12},
+    "pm_ub_init_25_25": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
+                         "label": r"$PM_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 12},
+    "ipdd_init_25_25": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
+                        "label": r"$IPDD(\mathbf{x}^0_{max})$",
+                        "markersize": 15},
+    "gdpa_init_25_25": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
+                        "label": r"$GDPA(\mathbf{x}^0_{max})$",
+                        "markersize": 10},
+    "gdpa_init_0_0": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
+                      "label": r"$GDPA(\mathbf{x}^0_1)$", "markersize": 6},
+    "gdpa_init_-25_-25": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
+                          "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
+    "pga_init_25_25": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
+                       "label": r"$PGA(\mathbf{x}^0_{max})$",
+                       "markersize": 10},
+    "pga_init_0_0": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
+                     "label": r"$PGA(\mathbf{x}^0_1)$", "markersize": 6},
+    "pga_init_-25_-25": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
+                         "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
+
+
+def form_optimizers_init_names(opt_names, initial_vectors):
+    r = []
+    for opt_name in opt_names:
+        if opt_name == "mps":
+            r.append(opt_name)
+        elif opt_name in ["pm_ub", "pm_lb", "ipdd"]:
+            suffix = '_'.join(map(str, initial_vectors[0]))
+            r.append(opt_name + "_init_" + suffix)
+        else:
+            for initial_vector in initial_vectors:
+                suffix = '_'.join(map(str, initial_vector))
+                r.append(opt_name + "_init_" + suffix)
+    return r
+
 
 def objective_value(path_r, path_w, T, opt_name, function_name, freq_s):
     # setting KMP_DUPLICATE_LIB_OK=TRUE is used to prevent the error: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
@@ -228,6 +268,7 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
             data = pd.read_json(filepath)
             constraint_violations = []
             f = data["f"].tolist()
+            print("param C f ", f)
             for i in range(len(f)):
                 constraint_violations.append(abs(min(0, min(f[i]))))
 
@@ -264,20 +305,98 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     plt.show()
 
 
+def initialization(opt_names, initial_vectors, T, path_r, path_w, freq_s):
+    opt_names_init = form_optimizers_init_names(opt_names=opt_names, initial_vectors=initial_vectors)
+    plt.figure(figsize=(8, 6))
+    opts = {}
+    opts_constraints = {}
+    for opt in opt_names_init:
+        data = pd.read_json(path_r.joinpath(opt + ".json"))
+        data = data.dropna(subset=['J'])
+        freq_elem = int(len(data) / (T / freq_s))
+        if freq_elem > 0:
+            data = data.iloc[::freq_elem, :]
+        opts[opt] = data
+        constraint_violations = []
+        f = data["f"].tolist()
+        for i in range(len(f)):
+            constraint_violations.append(abs(min(0, min(f[i]))))
+        opts_constraints[opt] = constraint_violations
+    # objective function
+    # plt.figure(figsize=(10, 5))
+    for opt in opt_names_init:
+        plt.plot(
+            opts[opt]["runtime"],
+            opts[opt]["J"],
+            color=visualization_spec_init[opt]["color"],
+            marker=visualization_spec_init[opt]["marker"],
+            linestyle=visualization_spec_init[opt]["linestyle"],
+            label=visualization_spec_init[opt]["label"],
+            markersize=visualization_spec_init[opt]["markersize"],
+        )
+        if any(optimizer in opt for optimizer in ["mps", "pm_lb", "pm_ub"]):
+            plt.axhline(
+                y=opts[opt]["J"][0],
+                xmin=opts[opt]["runtime"][0] / (T),
+                xmax=1,
+                color=visualization_spec_init[opt]["color"],
+                linestyle=visualization_spec_init[opt]["linestyle"], )
+    plt.xlim([0, T])
+    # plt.ylim([lower_bound, upper_bound])
+    plt.legend(loc="upper right")
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Objective value", fontsize=14)
+    plt.grid()
+    plt.savefig(path_w.joinpath("objective_value_init.svg"), format='svg')
+    plt.show()
+
+    for opt in opt_names_init:
+        plt.plot(
+            opts[opt]["runtime"],
+            opts_constraints[opt],
+            color=visualization_spec_init[opt]["color"],
+            marker=visualization_spec_init[opt]["marker"],
+            linestyle=visualization_spec_init[opt]["linestyle"],
+            label=visualization_spec_init[opt]["label"],
+            markersize=visualization_spec_init[opt]["markersize"],
+        )
+        if any(optimizer in opt for optimizer in ["mps", "pm_lb", "pm_ub"]):
+            plt.axhline(
+                y=opts_constraints[opt][0],
+                xmin=opts[opt]["runtime"][0] / (T),
+                xmax=1,
+                color=visualization_spec_init[opt]["color"],
+                linestyle=visualization_spec_init[opt]["linestyle"], )
+    plt.xlim([0, T])
+    # plt.ylim([lower_bound, upper_bound])
+    plt.legend(loc="upper right")
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Constraint violation", fontsize=14)
+    plt.grid()
+    plt.savefig(path_w.joinpath("constraint_violation_init.svg"), format='svg')
+    plt.show()
+
+
 if __name__ == "__main__":
     function = "fun_2"
     problem_spec = PROBLEM_SPECS[function]
     grad_spec = GRADIENT_SPECS[function]
     eval_spec = EVAL_SPECS[function]
+    """
     wandb.init(
         project="nonlinear_optimization",
         config={**problem_spec, **grad_spec},
         # Optional: add a name for this run
         name=f"optimization_run_{time.strftime('%Y%m%d_%H%M%S')}"
     )
+    """
     parameter_C(opt_names=["pm", "pga"], T=problem_spec["T"], Cs=eval_spec["Cs"],
                 path_r=Path("data/nonlinear").joinpath(function).joinpath("parameter_C"),
-                path_w=Path("data/nonlinear").joinpath(function))
+                path_w=Path("plots/nonlinear").joinpath(function))
+    initialization(opt_names=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
+                   initial_vectors=[[25, 25], [0, 0], [-25, -25]], T=problem_spec["T"],
+                   path_r=Path("data/nonlinear").joinpath(function).joinpath("initialization"),
+                   path_w=Path("plots/nonlinear").joinpath(function), freq_s=10)
     """
     objective_value(path_r=Path("data/nonlinear").joinpath(function),
                     path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
@@ -285,5 +404,5 @@ if __name__ == "__main__":
     constraint_violation(path_r=Path("data/nonlinear").joinpath(function),
                     path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
                     opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
-    """
     wandb.finish()
+    """

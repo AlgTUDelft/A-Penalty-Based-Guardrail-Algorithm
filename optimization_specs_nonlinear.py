@@ -97,7 +97,7 @@ GRADIENT_SPECS = {
 
 EVAL_SPECS = {
     "fun_2": {"initial_vectors": [[25] * PROBLEM_SPECS["fun_2"]["num_var"],
-                                  [20] * PROBLEM_SPECS["fun_2"]["num_var"], [10] * PROBLEM_SPECS["fun_2"]["num_var"],
-                                  ],
+                                  [10] * PROBLEM_SPECS["fun_2"]["num_var"], [0] * PROBLEM_SPECS["fun_2"]["num_var"],
+                                  [-10] * PROBLEM_SPECS["fun_2"]["num_var"], [-25] * PROBLEM_SPECS["fun_2"]["num_var"], [25, -10]],
               "Cs": [5, 1, 0.5, 0.25, 0.1, 0.01]},
 }
