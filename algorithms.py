@@ -102,7 +102,7 @@ def ipdd(
     return Js, constraint_values, solutions, runtimes[1:]
 
 
-def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, step_size, perturbation_term, beta, gamma):
+def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, step_size_init, perturbation_term, beta_init, gamma):
     print("GDPA")
     Js, constraint_values, solutions, runtimes = [], [], [], [0]
     solution_prev = initial_vector
@@ -110,6 +110,8 @@ def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, ste
     outer_iter = 0
     while runtimes[-1] < T:
         outer_iter += 1
+        beta = beta_init * outer_iter ** (1 / 3)
+        step_size = step_size_init*(1 / (outer_iter ** (1 / 3)))
         start_time = time.time()
         solution_prev_tf = tf.Variable(solution_prev, dtype=tf.float32)
         if np.isnan(solution_prev).any():
@@ -135,8 +137,6 @@ def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, ste
                         sum((-1) * c[i][j] * solution[j] for j in range(num_var)) - q[i] * (-1)))
         solution_prev = solution
         lambdas_prev = lambdas
-        beta = beta * outer_iter ** (1 / 3)
-        step_size = (1 / (outer_iter ** (1 / 3))) * step_size
         end_time = time.time()
         Js.append(sum(c[-1][i] * solution[i] for i in range(num_var)))
         constraint_values.append(np.dot(c[:-1], solution) - q)

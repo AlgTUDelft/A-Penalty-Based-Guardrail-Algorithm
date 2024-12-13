@@ -76,7 +76,7 @@ PROBLEM_SPECS = {"fun_1": {
     "q": [1, 5],
     "T": 100,
     "ub": [25] * 2,
-    "lb": [-25] * 2
+    "lb": [0] * 2
 }, "fun_2": {
     "num_con": 2,
     "num_var": 2,
@@ -101,10 +101,10 @@ PROBLEM_SPECS = {"fun_1": {
     "T": 100,
     "ub": [float("inf")] * 2,
     "lb": [0] * 2
-}, "fun_5": large_linear_program(num_con=10000, num_var=10000,
-                                 path=Path("data/fun_5").joinpath("fun_5.pickle"))
-}
+}},
+""""fun_5": large_linear_program(num_con=10000, num_var=10000, path=Path("data/fun_5").joinpath("fun_5.pickle"))
 PROBLEM_SPECS["fun_5"]["T"] = 3600
+"""
 GRADIENT_SPECS = {
     "fun_1": {
         "initial_vector": np.array([25] * PROBLEM_SPECS["fun_1"]["num_var"]),
@@ -137,7 +137,8 @@ GRADIENT_SPECS = {
         "delta": 0.000001,
         "grad_iter_max": 5000,
         "C": 0.5
-    },
+    }}
+"""
     "fun_5": {
         "initial_vector": get_initial_vector(initial_solution=[100] * PROBLEM_SPECS["fun_5"]["num_var"],
                                              problem_spec=PROBLEM_SPECS["fun_5"]),
@@ -147,10 +148,10 @@ GRADIENT_SPECS = {
         "grad_iter_max": 150000,
         "C": 10
     }
-}
+"""
 
 EVAL_SPECS = {
-    "fun_1": {"initial_vectors": [[50, 50]],
+    "fun_1": {"initial_vectors": [[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
               "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1]},
     "fun_2": {"initial_vectors": [[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
               "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1]},

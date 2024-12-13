@@ -97,7 +97,8 @@ def objective_value(num_con, T, opt_name, path, path_w, function_name, freq_s):
         data = pd.read_json(path.joinpath(opt + ".json"))
         freq_elem = int(len(data) / (T / freq_s))
         if freq_elem > 0:
-            data = data.iloc[::freq_elem, :]
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
         opts[opt] = data
     # objective function
     # plt.figure(figsize=(10, 5))
@@ -136,7 +137,8 @@ def constraint_violation(num_con, T, q, opt_name, path, path_w, function_name, f
         data = pd.read_json(path.joinpath(f"{opt}.json"))[["f", "runtime"]]
         freq_elem = int(len(data) / (T / freq_s))
         if freq_elem > 0:
-            data = data.iloc[::freq_elem, :]
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
         opts[opt] = {"runtime": data["runtime"].tolist(), "f": []}
         f = data["f"].tolist()
         # for i in range(len(f)):
@@ -205,7 +207,8 @@ def objective_value_initialization(num_con, T, opt_name, path, path_w, freq_s):
         data = pd.read_json(path.joinpath(opt + ".json"))
         freq_elem = int(len(data) / (T / freq_s))
         if freq_elem > 0:
-            data = data.iloc[::freq_elem, :]
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
         opts[opt] = data
     # objective function
     # plt.figure(figsize=(10, 5))
@@ -244,7 +247,8 @@ def constraint_violation_initialization(num_con, T, opt_name, path, path_w, freq
         data = pd.read_json(path.joinpath(f"{opt}.json"))[["f", "runtime"]]
         freq_elem = int(len(data) / (T / freq_s))
         if freq_elem > 0:
-            data = data.iloc[::freq_elem, :]
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
         opts[opt] = {"runtime": data["runtime"].tolist(), "f": []}
         f = data["f"].tolist()
         for i in range(len(f)):
@@ -383,8 +387,7 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
 
 
 if __name__ == "__main__":
-    """
-    function = "fun_3"
+    function = "fun_4"
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
     problem_spec = get_problem_spec(function)
@@ -398,6 +401,7 @@ if __name__ == "__main__":
                          path=path_read,
                          path_w=path_write, function_name=function,
                          freq_s=10)
+    """
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
                                                 opt_names_init=["mps", "pm_lb_init_25_25_25_25_25",
                                                                 "pm_ub_init_25_25_25_25_25",
