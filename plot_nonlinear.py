@@ -90,7 +90,8 @@ def objective_value(path_r, path_w, T, opt_name, function_name, freq_s):
         data = data.dropna(subset=['J'])
         freq_elem = int(len(data) / (T / freq_s))
         if freq_elem > 0:
-            data = data.iloc[::freq_elem, :]
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
         opts[opt] = data
     plt.figure(figsize=(8, 6))
     for opt in opt_name:
@@ -154,7 +155,8 @@ def constraint_violation(path_r, path_w, T, opt_name, function_name, freq_s):
         data = data.dropna(subset=['J'])
         freq_elem = int(len(data) / (T / freq_s))
         if freq_elem > 0:
-            data = data.iloc[::freq_elem, :]
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
         data_constraint = list(data["f"])
         runtimes[opt] = list(data["runtime"])
         for i in range(len(data_constraint)):
@@ -377,19 +379,84 @@ def initialization(opt_names, initial_vectors, T, path_r, path_w, freq_s):
     plt.show()
 
 
+def evaluate_gdpa(T, betas, freq_s, path_r, path_w):
+    styles = {
+        0.9: {"color": "#E31D1D", "marker": "o", "linestyle": "solid", "label": r"$\beta=0.9$", "markersize": 7},
+        0.75: {"color": "#36FF33", "marker": "^", "linestyle": linestyles["densely dashdotdotted"],
+               "label": r"$\beta=0.75$", "markersize": 7},
+        0.5: {"color": "#1c24dc", "marker": "s", "linestyle": "dashdot", "label": r"$\beta=0.5$", "markersize": 7},
+        0.25: {"color": "#0d5915", "marker": "*", "linestyle": linestyles['densely dashed'],
+               "label": r"$\beta=0.25$",
+               "markersize": 10},
+        0.1: {"color": "#f119c3", "marker": "2", "linestyle": "dotted", "label": r"$\beta=0.1$", "markersize": 15}}
+    plt.figure(figsize=(8, 6))
+    for beta in betas:
+        filename = f"gdpa_beta_{beta}.json"
+        filepath = path_r.joinpath(filename)
+        data = pd.read_json(filepath)
+        freq_elem = int(len(data) / (T / freq_s))
+        if freq_elem > 0:
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
+        plt.plot(data["runtime"], data["J"],
+                 color=styles[beta]["color"],
+                 marker=styles[beta]["marker"],
+                 linestyle=styles[beta]["linestyle"],
+                 label=styles[beta]["label"],
+                 markersize=styles[beta]["markersize"],
+                 )
+    plt.xlim([0, T])
+    # plt.ylim([lower_bound, upper_bound])
+    # plt.yscale("log")
+    plt.legend(loc='upper right')
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Objective value", fontsize=14)
+    plt.grid()
+    plt.savefig(path_w.joinpath("objective_value_gdpa.svg"), format='svg')
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    for beta in betas:
+        constraints = []
+        filename = f"gdpa_beta_{beta}.json"
+        filepath = path_r.joinpath(filename)
+        data = pd.read_json(filepath)
+        freq_elem = int(len(data) / (T / freq_s))
+        if freq_elem > 0:
+            indices = list(range(0, len(data), freq_elem)) + [-1]
+            data = data.iloc[indices]
+        data_constraint = list(data["f"])
+        for i in range(len(data_constraint)):
+            constraints.append(abs(min(0, min(data_constraint[i]))))
+        plt.plot(data["runtime"], constraints,
+                 color=styles[beta]["color"],
+                 marker=styles[beta]["marker"],
+                 linestyle=styles[beta]["linestyle"],
+                 label=styles[beta]["label"],
+                 markersize=styles[beta]["markersize"],
+                 )
+    plt.xlim([0, T])
+    # plt.ylim([lower_bound, upper_bound])
+    # plt.yscale("log")
+    plt.legend(loc='upper right')
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Constraint violation", fontsize=14)
+    plt.grid()
+    plt.savefig(path_w.joinpath("constraint_violation_gdpa.svg"), format='svg')
+    plt.show()
+
+
 if __name__ == "__main__":
-    function = "fun_2"
+    function = "fun_5"
     problem_spec = PROBLEM_SPECS[function]
     grad_spec = GRADIENT_SPECS[function]
     eval_spec = EVAL_SPECS[function]
-    """
     wandb.init(
         project="nonlinear_optimization",
         config={**problem_spec, **grad_spec},
         # Optional: add a name for this run
         name=f"optimization_run_{time.strftime('%Y%m%d_%H%M%S')}"
     )
-    """
     parameter_C(opt_names=["pm", "pga"], T=problem_spec["T"], Cs=eval_spec["Cs"],
                 path_r=Path("data/nonlinear").joinpath(function).joinpath("parameter_C"),
                 path_w=Path("plots/nonlinear").joinpath(function))
@@ -397,12 +464,13 @@ if __name__ == "__main__":
                    initial_vectors=[[25, 25], [0, 0], [-25, -25]], T=problem_spec["T"],
                    path_r=Path("data/nonlinear").joinpath(function).joinpath("initialization"),
                    path_w=Path("plots/nonlinear").joinpath(function), freq_s=10)
-    """
     objective_value(path_r=Path("data/nonlinear").joinpath(function),
                     path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
                     opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
     constraint_violation(path_r=Path("data/nonlinear").joinpath(function),
-                    path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
-                    opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
+                         path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
+                         opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
     wandb.finish()
-    """
+    evaluate_gdpa(T=problem_spec["T"], betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=10,
+                  path_r=Path("data/nonlinear").joinpath(function).joinpath("evaluate_gdpa"),
+                  path_w=Path("plots/nonlinear").joinpath(function))

@@ -59,9 +59,9 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
                                                                       T=problem_spec["T"],
                                                                       initial_vector=initial_vector,
                                                                       initial_lambdas=grad_spec["initial_lambdas"],
-                                                                      step_size_init=1,
-                                                                      perturbation_term=0.9,
-                                                                      beta_init=0.9, gamma=1)
+                                                                      step_size_init=0.891,
+                                                                      perturbation_term=0.891,
+                                                                      beta_init=0.9, gamma=0.99)
         save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path,
              name="gdpa_init_" + suffix, vars=var_gdpa)
         """
@@ -146,3 +146,25 @@ def determine_gradient_descent_iterations(problem_spec, grad_spec, grad_iters, p
                                                                    grad_iter_max=grad_iter_max)
         save(dict_=pm_dict, J=J, f=constraint_values, runtime=runtime, path=path,
              name=f"pm_C={grad_spec['C']}_grad_iter={grad_iter_max}", vars=vars)
+
+
+def evaluate_gdpa(problem_spec, grad_spec, beta_inits, gammas, path):
+    for beta_init, gamma in zip(beta_inits, gammas):
+        print("Beta ", beta_init)
+        print("Gamma ", gamma)
+        gdpa_dict = {}
+        J_gdpa, constraint_values_gdpa, var_gdpa, runtime_gdpa = gdpa(
+            num_var=problem_spec["num_var"],
+            num_con=problem_spec["num_con"],
+            c=problem_spec["c"], q=problem_spec["q"],
+            ub=problem_spec["ub"],
+            lb=problem_spec["lb"],
+            T=problem_spec["T"],
+            initial_vector=grad_spec["initial_vector"],
+            initial_lambdas=grad_spec["initial_lambdas"],
+            step_size_init=beta_init * gamma,
+            perturbation_term=beta_init * gamma,
+            beta_init=beta_init, gamma=gamma
+        )
+        save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path,
+             name="gdpa_beta_{}".format(beta_init), vars=var_gdpa)

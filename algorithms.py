@@ -111,7 +111,7 @@ def gdpa(num_var, num_con, c, q, ub, lb, T, initial_vector, initial_lambdas, ste
     while runtimes[-1] < T:
         outer_iter += 1
         beta = beta_init * outer_iter ** (1 / 3)
-        step_size = step_size_init*(1 / (outer_iter ** (1 / 3)))
+        step_size = step_size_init * (1 / (outer_iter ** (1 / 3)))
         start_time = time.time()
         solution_prev_tf = tf.Variable(solution_prev, dtype=tf.float32)
         if np.isnan(solution_prev).any():

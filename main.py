@@ -3,7 +3,7 @@ from algorithms import *
 from eval import *
 
 if __name__ == "__main__":
-    function = "fun_4"
+    function = "fun_3"
     path: Path = Path("data").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
@@ -57,7 +57,6 @@ if __name__ == "__main__":
         grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=ipdd_dict, J=J_ipdd, f=constraint_values_ipdd, runtime=runtime_ipdd, path=path, name="ipdd",
          vars=var_ipdd)
-    """
     J_gdpa, constraint_values_gdpa, var_gdpa, runtime_gdpa = gdpa(num_var=problem_spec["num_var"],
                                                                   num_con=problem_spec["num_con"],
                                                                   c=problem_spec["c"], q=problem_spec["q"],
@@ -71,7 +70,6 @@ if __name__ == "__main__":
                                                                   beta_init=0.9, gamma=0.99)
     save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path, name="gdpa",
          vars=var_gdpa)
-    """
     J_pga, constraint_values_pga, var_pga, runtime_pga = pga(num_var=problem_spec["num_var"],
                                                              num_con=problem_spec["num_con"],
                                                              c=problem_spec["c"],
@@ -83,16 +81,14 @@ if __name__ == "__main__":
                                                              patience=grad_spec["patience"],
                                                              grad_iter_max=grad_spec["grad_iter_max"])
     save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga", vars=var_pga)
-    """
-    """
     determine_gradient_descent_iterations(problem_spec
                                           =problem_spec, grad_spec=grad_spec,
                                           grad_iters=[500000, 1000000],
                                           path=path.joinpath("gradient_descent_iterations"))
     initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
                    path=path.joinpath("initialization"))
-    """
-    """
     parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
                 path=path.joinpath("parameter_C"))
     """
+    evaluate_gdpa(problem_spec=problem_spec, grad_spec=grad_spec, beta_inits=[0.75],
+                  gammas=[0.99], path=path.joinpath("evaluate_gdpa"))

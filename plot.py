@@ -68,26 +68,26 @@ visualization_spec_init = {
     "mps": {"color": "#36FF33", "marker": "s", "linestyle": "solid", "label": r"$MPS(\mathbf{x}^0_{max})$",
             "markersize": 12},
     "pm_lb_init_25_25_25_25_25": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
-                         "label": r"$PM_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 12},
+                                  "label": r"$PM_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 12},
     "pm_ub_init_25_25_25_25_25": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
-                         "label": r"$PM_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 12},
+                                  "label": r"$PM_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 12},
     "ipdd_init_25_25_25_25_25": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
-                        "label": r"$IPDD(\mathbf{x}^0_{max})$",
-                        "markersize": 15},
+                                 "label": r"$IPDD(\mathbf{x}^0_{max})$",
+                                 "markersize": 15},
     "gdpa_init_25_25_25_25_25": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
-                        "label": r"$GDPA(\mathbf{x}^0_{max})$",
-                        "markersize": 10},
+                                 "label": r"$GDPA(\mathbf{x}^0_{max})$",
+                                 "markersize": 10},
     "gdpa_init_20_20_20_20_20": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
-                        "label": r"$GDPA(\mathbf{x}^0_1)$", "markersize": 6},
+                                 "label": r"$GDPA(\mathbf{x}^0_1)$", "markersize": 6},
     "gdpa_init_10_10_10_10_10": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
-                        "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
+                                 "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
     "pga_init_25_25_25_25_25": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
-                       "label": r"$PGA(\mathbf{x}^0_{max})$",
-                       "markersize": 10},
+                                "label": r"$PGA(\mathbf{x}^0_{max})$",
+                                "markersize": 10},
     "pga_init_20_20_20_20_20": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
-                       "label": r"$PGA(\mathbf{x}^0_1)$", "markersize": 6},
+                                "label": r"$PGA(\mathbf{x}^0_1)$", "markersize": 6},
     "pga_init_10_10_10_10_10": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
-                       "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
+                                "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
 
 
 def objective_value(num_con, T, opt_name, path, path_w, function_name, freq_s):
@@ -385,15 +385,86 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     plt.show()
 
 
+def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w):
+    styles = {
+        0.9: {"color": "#E31D1D", "marker": "o", "linestyle": "solid", "label": r"$\beta=0.9$", "markersize": 7},
+        0.75: {"color": "#36FF33", "marker": "^", "linestyle": linestyles["densely dashdotdotted"],
+               "label": r"$\beta=0.75$", "markersize": 7},
+        0.5: {"color": "#1c24dc", "marker": "s", "linestyle": "dashdot", "label": r"$\beta=0.5$", "markersize": 7},
+        0.25: {"color": "#0d5915", "marker": "*", "linestyle": linestyles['densely dashed'],
+               "label": r"$\beta=0.25$",
+               "markersize": 10},
+        0.1: {"color": "#f119c3", "marker": "2", "linestyle": "dotted", "label": r"$\beta=0.1$", "markersize": 15}}
+    plt.figure(figsize=(8, 6))
+    for beta in betas:
+        filename = f"gdpa_beta_{beta}.json"
+        filepath = path_r.joinpath(filename)
+        data = pd.read_json(filepath)
+        freq_elem = int(len(data) / (T / freq_s))
+        if freq_elem > 0:
+            indices = list(range(0, len(data), freq_elem))
+            if indices[-1] < len(data) * 0.97:
+                indices += [-1]
+            data = data.iloc[indices]
+        plt.plot(data["runtime"], data["J"],
+                 color=styles[beta]["color"],
+                 marker=styles[beta]["marker"],
+                 linestyle=styles[beta]["linestyle"],
+                 label=styles[beta]["label"],
+                 markersize=styles[beta]["markersize"],
+                 )
+    plt.xlim([0, T])
+    # plt.ylim([lower_bound, upper_bound])
+    # plt.yscale("log")
+    plt.legend(loc='upper right')
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Objective value", fontsize=14)
+    plt.grid()
+    plt.savefig(path_w.joinpath("objective_value_" + function + "_gdpa.svg"), format='svg')
+    plt.show()
+
+    plt.figure(figsize=(8, 6))
+    for beta in betas:
+        constraints = []
+        filename = f"gdpa_beta_{beta}.json"
+        filepath = path_r.joinpath(filename)
+        data = pd.read_json(filepath)
+        freq_elem = int(len(data) / (T / freq_s))
+        if freq_elem > 0:
+            indices = list(range(0, len(data), freq_elem))
+            if indices[-1] < len(data) * 0.97:
+                indices += [-1]
+            data = data.iloc[indices]
+        data_constraint = list(data["f"])
+        for i in range(len(data_constraint)):
+            constraints.append(abs(min(0, min(data_constraint[i]))))
+        plt.plot(data["runtime"], constraints,
+                 color=styles[beta]["color"],
+                 marker=styles[beta]["marker"],
+                 linestyle=styles[beta]["linestyle"],
+                 label=styles[beta]["label"],
+                 markersize=styles[beta]["markersize"],
+                 )
+    plt.xlim([0, T])
+    # plt.ylim([lower_bound, upper_bound])
+    # plt.yscale("log")
+    plt.legend(loc='upper right')
+    plt.xlabel("Computational time [s]", fontsize=14)
+    plt.ylabel("Constraint violation", fontsize=14)
+    plt.grid()
+    plt.savefig(path_w.joinpath("constraint_violation_" + function + "_gdpa.svg"), format='svg')
+    plt.show()
+
 
 if __name__ == "__main__":
-    function = "fun_4"
+    function = "fun_3"
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
     eval_spec = get_eval_spec(function)
     opt_name = ["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"]
+    """
     objective_value(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
                     path_w=path_write, function_name=function,
                     freq_s=10)
@@ -401,13 +472,12 @@ if __name__ == "__main__":
                          path=path_read,
                          path_w=path_write, function_name=function,
                          freq_s=10)
-    """
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
                                                 opt_names_init=["mps", "pm_lb_init_25_25_25_25_25",
                                                                 "pm_ub_init_25_25_25_25_25",
                                                                 "ipdd_init_25_25_25_25_25"],
-                                                initializations=[[25, 25, 25, 25, 25], [20,20,20,20,20],
-                                                                 [10,10,10,10,10]])
+                                                initializations=[[25, 25, 25, 25, 25], [20, 20, 20, 20, 20],
+                                                                 [10, 10, 10, 10, 10]])
     objective_value_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
                                    path=path_read.joinpath("initialization"), path_w=path_write,
                                    freq_s=10)
@@ -419,3 +489,6 @@ if __name__ == "__main__":
     parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[5, 1, 0.75, 0.5, 0.25, 0.1],
                 path_r=path_read.joinpath("parameter_C"), path_w=path_write)
     """
+    evaluate_gdpa(T=problem_spec["T"], function=function, betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=10,
+                  path_r=Path("data").joinpath(function).joinpath("evaluate_gdpa"),
+                  path_w=Path("plots").joinpath(function))

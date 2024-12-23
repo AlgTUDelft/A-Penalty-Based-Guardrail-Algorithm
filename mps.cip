@@ -1,85 +1,181 @@
 STATISTICS
   Problem name     : MPS
-  Variables        : 24 (7 binary, 0 integer, 0 implicit integer, 17 continuous)
-  Constraints      : 0 initial, 52 maximal
+  Variables        : 54 (16 binary, 0 integer, 0 implicit integer, 38 continuous)
+  Constraints      : 0 initial, 118 maximal
 OBJECTIVE
   Sense            : minimize
 VARIABLES
   [binary] <relu_active_0_0>: obj=0, original bounds=[0,1]
   [binary] <relu_active_0_1>: obj=0, original bounds=[0,1]
   [binary] <relu_active_0_2>: obj=0, original bounds=[0,1]
-  [binary] <relu_active_1_0>: obj=0, original bounds=[0,1]
+  [binary] <selu_is_positive_1_0>: obj=0, original bounds=[0,1]
+  [binary] <selu_is_positive_1_1>: obj=0, original bounds=[0,1]
+  [binary] <relu_active_2_0>: obj=0, original bounds=[0,1]
+  [binary] <elu_is_positive_0_0>: obj=0, original bounds=[0,1]
+  [binary] <relu_active_0_0>: obj=0, original bounds=[0,1]
+  [binary] <relu_active_0_1>: obj=0, original bounds=[0,1]
+  [binary] <leaky_relu_is_positive_1_0>: obj=0, original bounds=[0,1]
   [binary] <elu_is_positive_0_0>: obj=0, original bounds=[0,1]
   [binary] <elu_is_positive_0_1>: obj=0, original bounds=[0,1]
   [binary] <relu_active_1_0>: obj=0, original bounds=[0,1]
+  [binary] <relu_active_1_1>: obj=0, original bounds=[0,1]
+  [binary] <selu_is_positive_2_0>: obj=0, original bounds=[0,1]
+  [binary] <relu_active_0_0>: obj=0, original bounds=[0,1]
+  [continuous] <relu_output_0_2>: obj=0, original bounds=[0,+inf]
+  [continuous] <selu_output_1_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <x(3)>: obj=0, original bounds=[-25,25]
+  [continuous] <selu_output_1_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <x(4)>: obj=0, original bounds=[-25,25]
+  [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <relu_output_2_0>: obj=0, original bounds=[0,+inf]
+  [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <elu_output_0_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_1_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_2>: obj=0, original bounds=[-inf,+inf]
   [continuous] <relu_output_0_0>: obj=0, original bounds=[0,+inf]
+  [continuous] <layer_1_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <relu_output_0_1>: obj=0, original bounds=[0,+inf]
+  [continuous] <leaky_relu_output_1_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_1_neuron_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_0_neuron_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_1_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_1_neuron_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_2_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <elu_output_0_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_2_neuron_0>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <elu_output_0_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <x(0)>: obj=0, original bounds=[-25,25]
+  [continuous] <relu_output_0_0>: obj=0, original bounds=[0,+inf]
+  [continuous] <relu_output_1_0>: obj=0, original bounds=[0,+inf]
   [continuous] <x(1)>: obj=0, original bounds=[-25,25]
+  [continuous] <relu_output_1_1>: obj=0, original bounds=[0,+inf]
+  [continuous] <selu_output_2_0>: obj=0, original bounds=[-inf,+inf]
   [continuous] <relu_output_0_1>: obj=0, original bounds=[0,+inf]
   [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <relu_output_0_2>: obj=0, original bounds=[0,+inf]
-  [continuous] <layer_0_neuron_1>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <relu_output_1_0>: obj=0, original bounds=[0,+inf]
-  [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <layer_0_neuron_1>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <layer_1_neuron_0>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <elu_output_0_0>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <layer_0_neuron_2>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <elu_output_0_1>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <layer_1_neuron_0>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <x(0)>: obj=0, original bounds=[-25,25]
-  [continuous] <relu_output_1_0>: obj=0, original bounds=[0,+inf]
+  [continuous] <x(2)>: obj=0, original bounds=[-25,25]
+  [continuous] <relu_output_0_0>: obj=0, original bounds=[0,+inf]
   [continuous] <J>: obj=1, original bounds=[-inf,+inf]
 CONSTRAINTS
-  [linear] <c1>:  +2<x(0)>[C] -10000<relu_active_0_0>[B] <= 0;
-  [linear] <c2>:  +2<x(0)>[C] -10000<relu_active_0_0>[B] >= -10000;
-  [linear] <c3>: <relu_output_0_0>[C] -2<x(0)>[C] >= 0;
-  [linear] <c4>: <relu_output_0_0>[C] -2<x(0)>[C] +10000<relu_active_0_0>[B] <= 10000;
+  [linear] <c1>:  +6<x(0)>[C] +9<x(1)>[C] +9<x(2)>[C] +3<x(3)>[C] +8<x(4)>[C] -10000<relu_active_0_0>[B] <= 0;
+  [linear] <c2>:  +6<x(0)>[C] +9<x(1)>[C] +9<x(2)>[C] +3<x(3)>[C] +8<x(4)>[C] -10000<relu_active_0_0>[B] >= -10000;
+  [linear] <c3>: <relu_output_0_0>[C] -6<x(0)>[C] -9<x(1)>[C] -9<x(2)>[C] -3<x(3)>[C] -8<x(4)>[C] >= 0;
+  [linear] <c4>: <relu_output_0_0>[C] -6<x(0)>[C] -9<x(1)>[C] -9<x(2)>[C] -3<x(3)>[C] -8<x(4)>[C] +10000<relu_active_0_0>[B] <= 10000;
   [linear] <c5>: <relu_output_0_0>[C] >= 0;
   [linear] <c6>: <relu_output_0_0>[C] -10000<relu_active_0_0>[B] <= 0;
   [linear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>[C] -<relu_output_0_0>[C] == 0;
-  [linear] <c8>: <x(0)>[C] +5<x(1)>[C] -10000<relu_active_0_1>[B] <= 0;
-  [linear] <c9>: <x(0)>[C] +5<x(1)>[C] -10000<relu_active_0_1>[B] >= -10000;
-  [linear] <c10>: <relu_output_0_1>[C] -<x(0)>[C] -5<x(1)>[C] >= 0;
-  [linear] <c11>: <relu_output_0_1>[C] -<x(0)>[C] -5<x(1)>[C] +10000<relu_active_0_1>[B] <= 10000;
+  [linear] <c8>:  +6<x(0)>[C] +2<x(1)>[C] +3<x(2)>[C] +8<x(3)>[C] +6<x(4)>[C] -10000<relu_active_0_1>[B] <= 0;
+  [linear] <c9>:  +6<x(0)>[C] +2<x(1)>[C] +3<x(2)>[C] +8<x(3)>[C] +6<x(4)>[C] -10000<relu_active_0_1>[B] >= -10000;
+  [linear] <c10>: <relu_output_0_1>[C] -6<x(0)>[C] -2<x(1)>[C] -3<x(2)>[C] -8<x(3)>[C] -6<x(4)>[C] >= 0;
+  [linear] <c11>: <relu_output_0_1>[C] -6<x(0)>[C] -2<x(1)>[C] -3<x(2)>[C] -8<x(3)>[C] -6<x(4)>[C] +10000<relu_active_0_1>[B] <= 10000;
   [linear] <c12>: <relu_output_0_1>[C] >= 0;
   [linear] <c13>: <relu_output_0_1>[C] -10000<relu_active_0_1>[B] <= 0;
   [linear] <layer_0_neuron_1_constraint>: <layer_0_neuron_1>[C] -<relu_output_0_1>[C] == 0;
-  [linear] <c15>:  +3<x(0)>[C] +2<x(1)>[C] -10000<relu_active_0_2>[B] <= 0;
-  [linear] <c16>:  +3<x(0)>[C] +2<x(1)>[C] -10000<relu_active_0_2>[B] >= -10000;
-  [linear] <c17>: <relu_output_0_2>[C] -3<x(0)>[C] -2<x(1)>[C] >= 0;
-  [linear] <c18>: <relu_output_0_2>[C] -3<x(0)>[C] -2<x(1)>[C] +10000<relu_active_0_2>[B] <= 10000;
+  [linear] <c15>:  +6<x(0)>[C] +7<x(1)>[C] +10<x(2)>[C] +6<x(3)>[C] +7<x(4)>[C] -10000<relu_active_0_2>[B] <= 0;
+  [linear] <c16>:  +6<x(0)>[C] +7<x(1)>[C] +10<x(2)>[C] +6<x(3)>[C] +7<x(4)>[C] -10000<relu_active_0_2>[B] >= -10000;
+  [linear] <c17>: <relu_output_0_2>[C] -6<x(0)>[C] -7<x(1)>[C] -10<x(2)>[C] -6<x(3)>[C] -7<x(4)>[C] >= 0;
+  [linear] <c18>: <relu_output_0_2>[C] -6<x(0)>[C] -7<x(1)>[C] -10<x(2)>[C] -6<x(3)>[C] -7<x(4)>[C] +10000<relu_active_0_2>[B] <= 10000;
   [linear] <c19>: <relu_output_0_2>[C] >= 0;
   [linear] <c20>: <relu_output_0_2>[C] -10000<relu_active_0_2>[B] <= 0;
   [linear] <layer_0_neuron_2_constraint>: <layer_0_neuron_2>[C] -<relu_output_0_2>[C] == 0;
-  [linear] <c22>: <layer_0_neuron_0>[C] +5<layer_0_neuron_1>[C] +2<layer_0_neuron_2>[C] -10000<relu_active_1_0>[B] <= 0;
-  [linear] <c23>: <layer_0_neuron_0>[C] +5<layer_0_neuron_1>[C] +2<layer_0_neuron_2>[C] -10000<relu_active_1_0>[B] >= -10000;
-  [linear] <c24>: <relu_output_1_0>[C] -<layer_0_neuron_0>[C] -5<layer_0_neuron_1>[C] -2<layer_0_neuron_2>[C] >= 0;
-  [linear] <c25>: <relu_output_1_0>[C] -<layer_0_neuron_0>[C] -5<layer_0_neuron_1>[C] -2<layer_0_neuron_2>[C] +10000<relu_active_1_0>[B] <= 10000;
-  [linear] <c26>: <relu_output_1_0>[C] >= 0;
-  [linear] <c27>: <relu_output_1_0>[C] -10000<relu_active_1_0>[B] <= 0;
-  [linear] <layer_1_neuron_0_constraint>: <layer_1_neuron_0>[C] -<relu_output_1_0>[C] == 0;
-  [linear] <constraint(0)>: <layer_1_neuron_0>[C] >= 4;
-  [linear] <c30>: <x(0)>[C] +3<x(1)>[C] -10000<elu_is_positive_0_0>[B] <= 0;
-  [linear] <c31>: <x(0)>[C] +3<x(1)>[C] -10000<elu_is_positive_0_0>[B] >= -10000;
-  [linear] <c32>: <elu_output_0_0>[C] -<x(0)>[C] -3<x(1)>[C] >= 0;
-  [linear] <c33>: <elu_output_0_0>[C] -<x(0)>[C] -3<x(1)>[C] +10000<elu_is_positive_0_0>[B] <= 10000;
-  [nonlinear] <c34>: <elu_output_0_0>+((exp((<x(0)>+<x(1)>*3))+(-1))+<elu_is_positive_0_0>*(-10000))*(-1) >= 0;
-  [nonlinear] <c35>: <elu_output_0_0>+((exp((<x(0)>+<x(1)>*3))+(-1))+<elu_is_positive_0_0>*10000)*(-1) <= 0;
+  [linear] <c22>:  +2<layer_0_neuron_0>[C] +2<layer_0_neuron_1>[C] +6<layer_0_neuron_2>[C] -10000<selu_is_positive_1_0>[B] <= 0;
+  [linear] <c23>:  +2<layer_0_neuron_0>[C] +2<layer_0_neuron_1>[C] +6<layer_0_neuron_2>[C] -10000<selu_is_positive_1_0>[B] >= -10000;
+  [linear] <c24>: <selu_output_1_0>[C] -2.1014<layer_0_neuron_0>[C] -2.1014<layer_0_neuron_1>[C] -6.3042<layer_0_neuron_2>[C] >= 0;
+  [linear] <c25>: <selu_output_1_0>[C] -2.1014<layer_0_neuron_0>[C] -2.1014<layer_0_neuron_1>[C] -6.3042<layer_0_neuron_2>[C] +10000<selu_is_positive_1_0>[B] <= 10000;
+  [nonlinear] <c26>: <selu_output_1_0>+((exp((<layer_0_neuron_0>*2+<layer_0_neuron_1>*2+<layer_0_neuron_2>*6))+(-1))*1.75809+<selu_is_positive_1_0>*(-10000))*(-1) >= 0;
+  [nonlinear] <c27>: <selu_output_1_0>+((exp((<layer_0_neuron_0>*2+<layer_0_neuron_1>*2+<layer_0_neuron_2>*6))+(-1))*1.75809+<selu_is_positive_1_0>*10000)*(-1) <= 0;
+  [linear] <layer_1_neuron_0_constraint>: <layer_1_neuron_0>[C] -<selu_output_1_0>[C] == 0;
+  [linear] <c29>:  +10<layer_0_neuron_0>[C] +<layer_0_neuron_1>[C] +8<layer_0_neuron_2>[C] -10000<selu_is_positive_1_1>[B] <= 0;
+  [linear] <c30>:  +10<layer_0_neuron_0>[C] +<layer_0_neuron_1>[C] +8<layer_0_neuron_2>[C] -10000<selu_is_positive_1_1>[B] >= -10000;
+  [linear] <c31>: <selu_output_1_1>[C] -10.507<layer_0_neuron_0>[C] -1.0507<layer_0_neuron_1>[C] -8.4056<layer_0_neuron_2>[C] >= 0;
+  [linear] <c32>: <selu_output_1_1>[C] -10.507<layer_0_neuron_0>[C] -1.0507<layer_0_neuron_1>[C] -8.4056<layer_0_neuron_2>[C] +10000<selu_is_positive_1_1>[B] <= 10000;
+  [nonlinear] <c33>: <selu_output_1_1>+((exp((<layer_0_neuron_0>*10+<layer_0_neuron_1>+<layer_0_neuron_2>*8))+(-1))*1.75809+<selu_is_positive_1_1>*(-10000))*(-1) >= 0;
+  [nonlinear] <c34>: <selu_output_1_1>+((exp((<layer_0_neuron_0>*10+<layer_0_neuron_1>+<layer_0_neuron_2>*8))+(-1))*1.75809+<selu_is_positive_1_1>*10000)*(-1) <= 0;
+  [linear] <layer_1_neuron_1_constraint>: <layer_1_neuron_1>[C] -<selu_output_1_1>[C] == 0;
+  [linear] <c36>: <layer_1_neuron_0>[C] +8<layer_1_neuron_1>[C] -10000<relu_active_2_0>[B] <= 0;
+  [linear] <c37>: <layer_1_neuron_0>[C] +8<layer_1_neuron_1>[C] -10000<relu_active_2_0>[B] >= -10000;
+  [linear] <c38>: <relu_output_2_0>[C] -<layer_1_neuron_0>[C] -8<layer_1_neuron_1>[C] >= 0;
+  [linear] <c39>: <relu_output_2_0>[C] -<layer_1_neuron_0>[C] -8<layer_1_neuron_1>[C] +10000<relu_active_2_0>[B] <= 10000;
+  [linear] <c40>: <relu_output_2_0>[C] >= 0;
+  [linear] <c41>: <relu_output_2_0>[C] -10000<relu_active_2_0>[B] <= 0;
+  [linear] <layer_2_neuron_0_constraint>: <layer_2_neuron_0>[C] -<relu_output_2_0>[C] == 0;
+  [linear] <constraint(0)>: <layer_2_neuron_0>[C] >= 10;
+  [linear] <c44>:  +8<x(0)>[C] +6<x(1)>[C] +2<x(2)>[C] +10<x(3)>[C] +3<x(4)>[C] -10000<elu_is_positive_0_0>[B] <= 0;
+  [linear] <c45>:  +8<x(0)>[C] +6<x(1)>[C] +2<x(2)>[C] +10<x(3)>[C] +3<x(4)>[C] -10000<elu_is_positive_0_0>[B] >= -10000;
+  [linear] <c46>: <elu_output_0_0>[C] -8<x(0)>[C] -6<x(1)>[C] -2<x(2)>[C] -10<x(3)>[C] -3<x(4)>[C] >= 0;
+  [linear] <c47>: <elu_output_0_0>[C] -8<x(0)>[C] -6<x(1)>[C] -2<x(2)>[C] -10<x(3)>[C] -3<x(4)>[C] +10000<elu_is_positive_0_0>[B] <= 10000;
+  [nonlinear] <c48>: <elu_output_0_0>+((exp((<x(0)>*8+<x(1)>*6+<x(2)>*2+<x(3)>*10+<x(4)>*3))+(-1))+<elu_is_positive_0_0>*(-10000))*(-1) >= 0;
+  [nonlinear] <c49>: <elu_output_0_0>+((exp((<x(0)>*8+<x(1)>*6+<x(2)>*2+<x(3)>*10+<x(4)>*3))+(-1))+<elu_is_positive_0_0>*10000)*(-1) <= 0;
   [linear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>[C] -<elu_output_0_0>[C] == 0;
-  [linear] <c37>:  +2<x(0)>[C] +4<x(1)>[C] -10000<elu_is_positive_0_1>[B] <= 0;
-  [linear] <c38>:  +2<x(0)>[C] +4<x(1)>[C] -10000<elu_is_positive_0_1>[B] >= -10000;
-  [linear] <c39>: <elu_output_0_1>[C] -2<x(0)>[C] -4<x(1)>[C] >= 0;
-  [linear] <c40>: <elu_output_0_1>[C] -2<x(0)>[C] -4<x(1)>[C] +10000<elu_is_positive_0_1>[B] <= 10000;
-  [nonlinear] <c41>: <elu_output_0_1>+((exp((<x(0)>*2+<x(1)>*4))+(-1))+<elu_is_positive_0_1>*(-10000))*(-1) >= 0;
-  [nonlinear] <c42>: <elu_output_0_1>+((exp((<x(0)>*2+<x(1)>*4))+(-1))+<elu_is_positive_0_1>*10000)*(-1) <= 0;
+  [linear] <constraint(1)>: <layer_0_neuron_0>[C] >= 2;
+  [linear] <c52>:  +8<x(0)>[C] +<x(1)>[C] +<x(2)>[C] +3<x(3)>[C] +3<x(4)>[C] -10000<relu_active_0_0>[B] <= 0;
+  [linear] <c53>:  +8<x(0)>[C] +<x(1)>[C] +<x(2)>[C] +3<x(3)>[C] +3<x(4)>[C] -10000<relu_active_0_0>[B] >= -10000;
+  [linear] <c54>: <relu_output_0_0>[C] -8<x(0)>[C] -<x(1)>[C] -<x(2)>[C] -3<x(3)>[C] -3<x(4)>[C] >= 0;
+  [linear] <c55>: <relu_output_0_0>[C] -8<x(0)>[C] -<x(1)>[C] -<x(2)>[C] -3<x(3)>[C] -3<x(4)>[C] +10000<relu_active_0_0>[B] <= 10000;
+  [linear] <c56>: <relu_output_0_0>[C] >= 0;
+  [linear] <c57>: <relu_output_0_0>[C] -10000<relu_active_0_0>[B] <= 0;
+  [linear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>[C] -<relu_output_0_0>[C] == 0;
+  [linear] <c59>:  +4<x(0)>[C] +3<x(1)>[C] +<x(2)>[C] +4<x(3)>[C] +4<x(4)>[C] -10000<relu_active_0_1>[B] <= 0;
+  [linear] <c60>:  +4<x(0)>[C] +3<x(1)>[C] +<x(2)>[C] +4<x(3)>[C] +4<x(4)>[C] -10000<relu_active_0_1>[B] >= -10000;
+  [linear] <c61>: <relu_output_0_1>[C] -4<x(0)>[C] -3<x(1)>[C] -<x(2)>[C] -4<x(3)>[C] -4<x(4)>[C] >= 0;
+  [linear] <c62>: <relu_output_0_1>[C] -4<x(0)>[C] -3<x(1)>[C] -<x(2)>[C] -4<x(3)>[C] -4<x(4)>[C] +10000<relu_active_0_1>[B] <= 10000;
+  [linear] <c63>: <relu_output_0_1>[C] >= 0;
+  [linear] <c64>: <relu_output_0_1>[C] -10000<relu_active_0_1>[B] <= 0;
+  [linear] <layer_0_neuron_1_constraint>: <layer_0_neuron_1>[C] -<relu_output_0_1>[C] == 0;
+  [linear] <c66>:  +3<layer_0_neuron_0>[C] +9<layer_0_neuron_1>[C] -10000<leaky_relu_is_positive_1_0>[B] <= 0;
+  [linear] <c67>:  +3<layer_0_neuron_0>[C] +9<layer_0_neuron_1>[C] -10000<leaky_relu_is_positive_1_0>[B] >= -10000;
+  [linear] <c68>: <leaky_relu_output_1_0>[C] -3<layer_0_neuron_0>[C] -9<layer_0_neuron_1>[C] >= 0;
+  [linear] <c69>: <leaky_relu_output_1_0>[C] -3<layer_0_neuron_0>[C] -9<layer_0_neuron_1>[C] +10000<leaky_relu_is_positive_1_0>[B] <= 10000;
+  [linear] <c70>: <leaky_relu_output_1_0>[C] -0.03<layer_0_neuron_0>[C] -0.09<layer_0_neuron_1>[C] +10000<leaky_relu_is_positive_1_0>[B] >= 0;
+  [linear] <c71>: <leaky_relu_output_1_0>[C] -0.03<layer_0_neuron_0>[C] -0.09<layer_0_neuron_1>[C] -10000<leaky_relu_is_positive_1_0>[B] <= 0;
+  [linear] <layer_1_neuron_0_constraint>: <layer_1_neuron_0>[C] -<leaky_relu_output_1_0>[C] == 0;
+  [linear] <constraint(2)>: <layer_1_neuron_0>[C] >= 8;
+  [linear] <c74>:  +5<x(0)>[C] +6<x(1)>[C] +3<x(2)>[C] +10<x(3)>[C] +9<x(4)>[C] -10000<elu_is_positive_0_0>[B] <= 0;
+  [linear] <c75>:  +5<x(0)>[C] +6<x(1)>[C] +3<x(2)>[C] +10<x(3)>[C] +9<x(4)>[C] -10000<elu_is_positive_0_0>[B] >= -10000;
+  [linear] <c76>: <elu_output_0_0>[C] -5<x(0)>[C] -6<x(1)>[C] -3<x(2)>[C] -10<x(3)>[C] -9<x(4)>[C] >= 0;
+  [linear] <c77>: <elu_output_0_0>[C] -5<x(0)>[C] -6<x(1)>[C] -3<x(2)>[C] -10<x(3)>[C] -9<x(4)>[C] +10000<elu_is_positive_0_0>[B] <= 10000;
+  [nonlinear] <c78>: <elu_output_0_0>+((exp((<x(0)>*5+<x(1)>*6+<x(2)>*3+<x(3)>*10+<x(4)>*9))+(-1))+<elu_is_positive_0_0>*(-10000))*(-1) >= 0;
+  [nonlinear] <c79>: <elu_output_0_0>+((exp((<x(0)>*5+<x(1)>*6+<x(2)>*3+<x(3)>*10+<x(4)>*9))+(-1))+<elu_is_positive_0_0>*10000)*(-1) <= 0;
+  [linear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>[C] -<elu_output_0_0>[C] == 0;
+  [linear] <c81>:  +9<x(0)>[C] +10<x(1)>[C] +10<x(2)>[C] +6<x(3)>[C] +5<x(4)>[C] -10000<elu_is_positive_0_1>[B] <= 0;
+  [linear] <c82>:  +9<x(0)>[C] +10<x(1)>[C] +10<x(2)>[C] +6<x(3)>[C] +5<x(4)>[C] -10000<elu_is_positive_0_1>[B] >= -10000;
+  [linear] <c83>: <elu_output_0_1>[C] -9<x(0)>[C] -10<x(1)>[C] -10<x(2)>[C] -6<x(3)>[C] -5<x(4)>[C] >= 0;
+  [linear] <c84>: <elu_output_0_1>[C] -9<x(0)>[C] -10<x(1)>[C] -10<x(2)>[C] -6<x(3)>[C] -5<x(4)>[C] +10000<elu_is_positive_0_1>[B] <= 10000;
+  [nonlinear] <c85>: <elu_output_0_1>+((exp((<x(0)>*9+<x(1)>*10+<x(2)>*10+<x(3)>*6+<x(4)>*5))+(-1))+<elu_is_positive_0_1>*(-10000))*(-1) >= 0;
+  [nonlinear] <c86>: <elu_output_0_1>+((exp((<x(0)>*9+<x(1)>*10+<x(2)>*10+<x(3)>*6+<x(4)>*5))+(-1))+<elu_is_positive_0_1>*10000)*(-1) <= 0;
   [linear] <layer_0_neuron_1_constraint>: <layer_0_neuron_1>[C] -<elu_output_0_1>[C] == 0;
-  [linear] <c44>:  +5<layer_0_neuron_0>[C] +4<layer_0_neuron_1>[C] -10000<relu_active_1_0>[B] <= 0;
-  [linear] <c45>:  +5<layer_0_neuron_0>[C] +4<layer_0_neuron_1>[C] -10000<relu_active_1_0>[B] >= -10000;
-  [linear] <c46>: <relu_output_1_0>[C] -5<layer_0_neuron_0>[C] -4<layer_0_neuron_1>[C] >= 0;
-  [linear] <c47>: <relu_output_1_0>[C] -5<layer_0_neuron_0>[C] -4<layer_0_neuron_1>[C] +10000<relu_active_1_0>[B] <= 10000;
-  [linear] <c48>: <relu_output_1_0>[C] >= 0;
-  [linear] <c49>: <relu_output_1_0>[C] -10000<relu_active_1_0>[B] <= 0;
+  [linear] <c88>:  +2<layer_0_neuron_0>[C] +<layer_0_neuron_1>[C] -10000<relu_active_1_0>[B] <= 0;
+  [linear] <c89>:  +2<layer_0_neuron_0>[C] +<layer_0_neuron_1>[C] -10000<relu_active_1_0>[B] >= -10000;
+  [linear] <c90>: <relu_output_1_0>[C] -2<layer_0_neuron_0>[C] -<layer_0_neuron_1>[C] >= 0;
+  [linear] <c91>: <relu_output_1_0>[C] -2<layer_0_neuron_0>[C] -<layer_0_neuron_1>[C] +10000<relu_active_1_0>[B] <= 10000;
+  [linear] <c92>: <relu_output_1_0>[C] >= 0;
+  [linear] <c93>: <relu_output_1_0>[C] -10000<relu_active_1_0>[B] <= 0;
   [linear] <layer_1_neuron_0_constraint>: <layer_1_neuron_0>[C] -<relu_output_1_0>[C] == 0;
-  [linear] <constraint(1)>: <layer_1_neuron_0>[C] >= 16;
-  [linear] <objective_function_constraint>: <J>[C] -<x(0)>[C] -10<x(1)>[C] >= 0;
+  [linear] <c95>:  +3<layer_0_neuron_0>[C] +7<layer_0_neuron_1>[C] -10000<relu_active_1_1>[B] <= 0;
+  [linear] <c96>:  +3<layer_0_neuron_0>[C] +7<layer_0_neuron_1>[C] -10000<relu_active_1_1>[B] >= -10000;
+  [linear] <c97>: <relu_output_1_1>[C] -3<layer_0_neuron_0>[C] -7<layer_0_neuron_1>[C] >= 0;
+  [linear] <c98>: <relu_output_1_1>[C] -3<layer_0_neuron_0>[C] -7<layer_0_neuron_1>[C] +10000<relu_active_1_1>[B] <= 10000;
+  [linear] <c99>: <relu_output_1_1>[C] >= 0;
+  [linear] <c100>: <relu_output_1_1>[C] -10000<relu_active_1_1>[B] <= 0;
+  [linear] <layer_1_neuron_1_constraint>: <layer_1_neuron_1>[C] -<relu_output_1_1>[C] == 0;
+  [linear] <c102>:  +2<layer_1_neuron_0>[C] +6<layer_1_neuron_1>[C] -10000<selu_is_positive_2_0>[B] <= 0;
+  [linear] <c103>:  +2<layer_1_neuron_0>[C] +6<layer_1_neuron_1>[C] -10000<selu_is_positive_2_0>[B] >= -10000;
+  [linear] <c104>: <selu_output_2_0>[C] -2.1014<layer_1_neuron_0>[C] -6.3042<layer_1_neuron_1>[C] >= 0;
+  [linear] <c105>: <selu_output_2_0>[C] -2.1014<layer_1_neuron_0>[C] -6.3042<layer_1_neuron_1>[C] +10000<selu_is_positive_2_0>[B] <= 10000;
+  [nonlinear] <c106>: <selu_output_2_0>+((exp((<layer_1_neuron_0>*2+<layer_1_neuron_1>*6))+(-1))*1.75809+<selu_is_positive_2_0>*(-10000))*(-1) >= 0;
+  [nonlinear] <c107>: <selu_output_2_0>+((exp((<layer_1_neuron_0>*2+<layer_1_neuron_1>*6))+(-1))*1.75809+<selu_is_positive_2_0>*10000)*(-1) <= 0;
+  [linear] <layer_2_neuron_0_constraint>: <layer_2_neuron_0>[C] -<selu_output_2_0>[C] == 0;
+  [linear] <constraint(3)>: <layer_2_neuron_0>[C] >= 1;
+  [linear] <c110>:  +10<x(0)>[C] +3<x(1)>[C] +9<x(2)>[C] +10<x(3)>[C] +7<x(4)>[C] -10000<relu_active_0_0>[B] <= 0;
+  [linear] <c111>:  +10<x(0)>[C] +3<x(1)>[C] +9<x(2)>[C] +10<x(3)>[C] +7<x(4)>[C] -10000<relu_active_0_0>[B] >= -10000;
+  [linear] <c112>: <relu_output_0_0>[C] -10<x(0)>[C] -3<x(1)>[C] -9<x(2)>[C] -10<x(3)>[C] -7<x(4)>[C] >= 0;
+  [linear] <c113>: <relu_output_0_0>[C] -10<x(0)>[C] -3<x(1)>[C] -9<x(2)>[C] -10<x(3)>[C] -7<x(4)>[C] +10000<relu_active_0_0>[B] <= 10000;
+  [linear] <c114>: <relu_output_0_0>[C] >= 0;
+  [linear] <c115>: <relu_output_0_0>[C] -10000<relu_active_0_0>[B] <= 0;
+  [linear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>[C] -<relu_output_0_0>[C] == 0;
+  [linear] <constraint(4)>: <layer_0_neuron_0>[C] >= 5;
+  [linear] <objective_function_constraint>: <J>[C] -2<x(0)>[C] -9<x(1)>[C] -7<x(2)>[C] -5<x(3)>[C] -7<x(4)>[C] >= 0;
 END
