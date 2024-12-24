@@ -582,26 +582,26 @@ def gdpa(problem_specs, grad_specs, step_size_init, perturbation_term, beta_init
     outer_iter = 0
     while runtimes[-1] < problem_specs["T"]:
         outer_iter += 1
-        #print("outer iteration ", outer_iter)
+        # print("outer iteration ", outer_iter)
         start_time = time.time()
         beta = beta_init * outer_iter ** (1 / 3)
-        #print("beta ", beta)
+        # print("beta ", beta)
         step_size = step_size_init * (1 / (outer_iter ** (1 / 3)))
-        #print("step size ", step_size)
+        # print("step size ", step_size)
         if tf.reduce_any(tf.math.is_nan(solution_prev)):
             break
         # first equation
         # np.ndarray([dJ/dx_1, dJ/dx_2,...,dJ/dx_n])_1xn
         delta_J = np.array(calculate_gradient_obj_fun(var=solution_prev, c_obj=c_obj))
-        #print("delta_J ", delta_J)
+        # print("delta_J ", delta_J)
         # tf.Tensor([df_1/dx_1,df_1/dx_2,...,df_1/dx_n],...,[df_m/dx_1,df_m/dx_2,...,df_m/dx_n])_mxn
         Jacobian = calculate_jacobian(
             var=solution_prev, w=w, q=q, activations=activations
         )
-        #print("Jacobian ", Jacobian)
+        # print("Jacobian ", Jacobian)
         # np.array([df_1/dx_1,df_2/dx_1,...,df_m/dx_1],...,[df_1/dx_n,df_2/dx_n,...,df_m/dx_n])_nxm
         Jacobian = tf.transpose(Jacobian)
-        #print("Jacobian ", Jacobian)
+        # print("Jacobian ", Jacobian)
         constraint_values_prev = get_constraint_values(
             var=solution_prev,
             w=w,
@@ -611,31 +611,31 @@ def gdpa(problem_specs, grad_specs, step_size_init, perturbation_term, beta_init
             gdpa_coeff_q=-1,
         )
         constraint_values_prev = tf.constant(constraint_values_prev, dtype=tf.float32)
-        #print("constraint values prev ", constraint_values_prev)
+        # print("constraint values prev ", constraint_values_prev)
         tau_beta = (
                 beta * constraint_values_prev + (1 - perturbation_term) * lambdas_prev
         )
-        #print("tau_beta ", tau_beta)
+        # print("tau_beta ", tau_beta)
         tau_beta_nonnegative = tf.maximum(tau_beta, 0)
-        #print("tau_beta_nonnegative ", tau_beta_nonnegative)
+        # print("tau_beta_nonnegative ", tau_beta_nonnegative)
         solution = solution_prev - step_size * (
                 delta_J + tf.tensordot(Jacobian, tau_beta_nonnegative, axes=1)
         )
-        #print("solution ", solution)
+        # print("solution ", solution)
         solution = tf.clip_by_value(solution, lb, ub)
-        #print("solution ", solution)
+        # print("solution ", solution)
         # second equationS_r = [i for i in range(num_con) if tau_beta[i] > 0]
         indices_range = tf.cast(tf.range(problem_specs["num_con"]), tf.int32)
-        #print("indices range ", indices_range)
+        # print("indices range ", indices_range)
         S_r = tf.where(tau_beta > 0)[:, 0]
         S_r = tf.cast(S_r, tf.int32)
-        #print("S_r ", S_r)
+        # print("S_r ", S_r)
         lambdas = tf.zeros(problem_specs["num_con"], dtype=tf.float32)
-        #print("lambdas ", lambdas)
+        # print("lambdas ", lambdas)
         mask = tf.reduce_any(
             tf.equal(tf.expand_dims(indices_range, 1), tf.expand_dims(S_r, 0)), axis=1
         )
-        #print("mask ", mask)
+        # print("mask ", mask)
         # calculate new constraint values
         constraint_values = get_constraint_values(
             var=solution,
@@ -646,17 +646,17 @@ def gdpa(problem_specs, grad_specs, step_size_init, perturbation_term, beta_init
             gdpa_coeff_q=-1,
         )
         constraint_values = tf.constant(constraint_values, dtype=tf.float32)
-        #print("constraint values ", constraint_values)
+        # print("constraint values ", constraint_values)
         # Calculate new lambda values
         new_lambda_values = tf.maximum(
             0.0, (1 - perturbation_term) * lambdas_prev + beta * constraint_values
         )
-        #print("new lambda values ", new_lambda_values)
+        # print("new lambda values ", new_lambda_values)
         # Update lambdas using the mask
         # where the mask is true, update the lambda values with the new lambda values (i \in S_r)
         # otherwise, keep the old lambda values (i \notin S_r)
         lambdas = tf.where(mask, new_lambda_values, lambdas)
-        #print("lambdas ", lambdas)
+        # print("lambdas ", lambdas)
         solution_prev = solution
         lambdas_prev = lambdas
         end_time = time.time()
@@ -670,6 +670,7 @@ def gdpa(problem_specs, grad_specs, step_size_init, perturbation_term, beta_init
         constraint_values_.append(constraint_value_temp)
         runtimes.append(end_time - start_time + runtimes[-1])
     return Js, constraint_values_, solutions, runtimes[1:]
+
 
 def pga(problem_specs, grad_specs, C):
     print("PGA")
@@ -730,5 +731,3 @@ def pga(problem_specs, grad_specs, C):
         constraint_values.append(constraint_value)
         runtimes.append(runtimes[-1] + end_time - start_time)
     return Js, constraint_values, variables, runtimes[1:]
-
-

@@ -72,10 +72,29 @@ def create_nonlinear_program(num_var, num_con, num_layers, num_neuron_per_layer,
 
 
 def verify_initial_vector(initial_solution, program_spec):
-    for i in range(program_spec["num_con"]):
-        left_side = 0
-        for j in range(program_spec["num_var"]):
-            left_side += program_spec["c"][i][j] * initial_solution[j]
+    w = program_spec["w"]
+    num_var = program_spec["num_var"]
+    num_con = program_spec["num_con"]
+    num_neuron_per_layer = program_spec["num_neuron_per_layer"]
+    for i in range(num_con):
+        w_con = w[i]
+        print(w)
+        num_neuron_per_layer_con = [num_var] + num_neuron_per_layer[i]
+        layer_output = initial_solution
+        for j in range(1, len(num_neuron_per_layer_con)):
+            w_layer = w_con[j-1]
+            print(w_layer)
+            neuron_per_layer_prev =  num_neuron_per_layer_con[j-1]
+            neuron_per_layer_curr = num_neuron_per_layer_con[j]
+            temp = []
+            for k in range(neuron_per_layer_curr):
+                neuron = 0
+                for n in range(neuron_per_layer_prev):
+                    neuron += layer_output[n] * w_layer[n][k]
+                temp.append(neuron)
+            layer_output = temp
+        left_side = layer_output[0]
+        print(left_side)
         if left_side - program_spec["q"][i] < 0:
             print("Left side is {}".format(left_side))
             raise ValueError("Infeasible initial solution!")
@@ -193,7 +212,7 @@ GRADIENT_SPECS = {
         "rho": 1
     },
     "fun_2": {
-        "initial_vector": np.array([25] * PROBLEM_SPECS["fun_2"]["num_var"]),
+        "initial_vector": get_initial_vector(initial_solution=np.array([1] * PROBLEM_SPECS["fun_2"]["num_var"]), problem_spec=PROBLEM_SPECS["fun_2"]),
         "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_2"]["num_con"]),
         "patience": 100,
         "delta": 0.000001,
