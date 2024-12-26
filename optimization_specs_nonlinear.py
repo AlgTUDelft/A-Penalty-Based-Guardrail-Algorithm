@@ -43,7 +43,10 @@ def create_nonlinear_program(num_var, num_con, num_layers, num_neuron_per_layer,
     if Path(path).exists():
         print("Function specification already exists")
         with open(path, 'rb') as f:
-            return pickle.load(f)
+            dict_ = pickle.load(f)
+            dict_["T"] = 500
+            print(dict_)
+            return dict_
     else:
         print("Function specification created")
         fun = {"num_var": num_var,
@@ -65,36 +68,50 @@ def create_nonlinear_program(num_var, num_con, num_layers, num_neuron_per_layer,
         with open(q_json_path, 'w') as f_json:
             json.dump(fun["q"], f_json, indent=2)
         # Save 'fun["w"]' into a JSON file for visual inspection
-        c_json_path = path.with_name(path.stem + '_w.json')
-        with open(c_json_path, 'w') as f_json:
+        w_json_path = path.with_name(path.stem + '_w.json')
+        with open(w_json_path, 'w') as f_json:
             json.dump(fun["w"], f_json, indent=2)
         return fun
 
 
 def verify_initial_vector(initial_solution, program_spec):
+    """
+    Verify weather proposed initial solution is feasible and thus can be used as the initial solution.
+    :param initial_solution: np.array
+    :param program_spec: dict
+    :return: bool
+    """
     w = program_spec["w"]
     num_var = program_spec["num_var"]
     num_con = program_spec["num_con"]
     num_neuron_per_layer = program_spec["num_neuron_per_layer"]
+    activation_fun = program_spec["activation_fun"]
     for i in range(num_con):
         w_con = w[i]
-        print(w)
         num_neuron_per_layer_con = [num_var] + num_neuron_per_layer[i]
+        activation_fun_con = activation_fun[i]
         layer_output = initial_solution
         for j in range(1, len(num_neuron_per_layer_con)):
-            w_layer = w_con[j-1]
-            print(w_layer)
-            neuron_per_layer_prev =  num_neuron_per_layer_con[j-1]
+            w_layer = w_con[j - 1]
+            activation_fun_layer = activation_fun_con[j - 1]
+            neuron_per_layer_prev = num_neuron_per_layer_con[j - 1]
             neuron_per_layer_curr = num_neuron_per_layer_con[j]
             temp = []
             for k in range(neuron_per_layer_curr):
                 neuron = 0
                 for n in range(neuron_per_layer_prev):
                     neuron += layer_output[n] * w_layer[n][k]
+                if activation_fun_layer == "exponential":
+                    neuron = math.exp(neuron)
+                elif activation_fun_layer == "sigmoid":
+                    neuron = 1 / (1 + math.exp(-neuron))
+                elif activation_fun_layer == "tanh":
+                    neuron = (math.exp(neuron) - math.exp(-neuron)) / (math.exp(neuron) + math.exp(-neuron))
+                else:
+                    neuron = neuron
                 temp.append(neuron)
             layer_output = temp
         left_side = layer_output[0]
-        print(left_side)
         if left_side - program_spec["q"][i] < 0:
             print("Left side is {}".format(left_side))
             raise ValueError("Infeasible initial solution!")
@@ -102,6 +119,12 @@ def verify_initial_vector(initial_solution, program_spec):
 
 
 def get_initial_vector(initial_solution, problem_spec):
+    """
+    Return initial solution if it is feasible, otherwise throw ValueError
+    :param initial_solution: np.array
+    :param problem_spec: dict
+    :return: np.array or Value Error
+    """
     try:
         # First, try the all-ones vector
         if verify_initial_vector(initial_solution=initial_solution, program_spec=problem_spec):
@@ -197,7 +220,7 @@ PROBLEM_SPECS = {"fun_1": {
     "fun_7": create_nonlinear_program(num_var=5, num_con=5, num_layers=[3, 1, 2, 3, 1],
                                       num_neuron_per_layer=[[3, 2, 1], [1], [2, 1], [2, 2, 1], [1]],
                                       activation_fun=[["relu", "selu", "relu"], ["elu"], ["relu", "leaky_relu"],
-                                                      ["elu", "relu", "selu"], ["relu"]], T=500,
+                                                      ["elu", "relu", "selu"], ["relu"]], T=200,
                                       path=Path("data/nonlinear/fun_7").joinpath("fun_7.pickle"))
 }
 
@@ -212,7 +235,7 @@ GRADIENT_SPECS = {
         "rho": 1
     },
     "fun_2": {
-        "initial_vector": get_initial_vector(initial_solution=np.array([1] * PROBLEM_SPECS["fun_2"]["num_var"]), problem_spec=PROBLEM_SPECS["fun_2"]),
+        "initial_vector": np.array([25] * PROBLEM_SPECS["fun_2"]["num_var"]),
         "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_2"]["num_con"]),
         "patience": 100,
         "delta": 0.000001,
@@ -257,12 +280,13 @@ GRADIENT_SPECS = {
         "rho": 1
     },
     "fun_7": {
-        "initial_vector": np.array([25] * PROBLEM_SPECS["fun_7"]["num_var"]),
+        "initial_vector": get_initial_vector(initial_solution=np.array([25] * PROBLEM_SPECS["fun_7"]["num_var"]),
+                                             problem_spec=PROBLEM_SPECS["fun_7"]),
         "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_7"]["num_con"]),
         "patience": 50,
         "delta": 0.000001,
-        "grad_iter_max": 5000,
-        "C": 0.5,
+        "grad_iter_max": 10000,
+        "C": 0.1,
         "rho": 1
     }
 }
@@ -283,6 +307,10 @@ EVAL_SPECS = {
     "fun_6": {"initial_vectors": [[25] * PROBLEM_SPECS["fun_2"]["num_var"],
                                   [0] * PROBLEM_SPECS["fun_2"]["num_var"],
                                   [-25] * PROBLEM_SPECS["fun_2"]["num_var"]],
+              "Cs": [5, 1, 0.5, 0.25, 0.1, 0.01]},
+    "fun_7": {"initial_vectors": [[25] * PROBLEM_SPECS["fun_7"]["num_var"],
+                                  [0] * PROBLEM_SPECS["fun_7"]["num_var"],
+                                  [-25] * PROBLEM_SPECS["fun_7"]["num_var"]],
               "Cs": [5, 1, 0.5, 0.25, 0.1, 0.01]}
 
 }

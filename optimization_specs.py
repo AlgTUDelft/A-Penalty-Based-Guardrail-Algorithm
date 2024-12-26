@@ -74,23 +74,15 @@ PROBLEM_SPECS = {"fun_1": {
     "num_var": 2,
     "c": [[1, 0], [1, 2], [1, 10]],
     "q": [1, 5],
-    "T": 100,
+    "T": 500,
     "ub": [25] * 2,
-    "lb": [0] * 2
-}, "fun_2": {
-    "num_con": 2,
-    "num_var": 2,
-    "c": [[1, 2], [1, 0], [1, 10]],
-    "q": [5, 1],
-    "T": 100,
-    "ub": [float("inf")] * 2,
     "lb": [0] * 2
 }, "fun_3": {
     "num_con": 4,
     "num_var": 5,
     "c": [[3, 2, 1, 1, 0], [1, 4, 2, 0, 1], [0, 1, 1, 3, 2], [2, 0, 1, 4, 1], [2, 3, 4, 5, 6]],
     "q": [50, 35, 40, 45],
-    "T": 200,
+    "T": 500,
     "ub": [float("inf")] * 5,
     "lb": [0] * 5
 }, "fun_4": {
@@ -98,7 +90,7 @@ PROBLEM_SPECS = {"fun_1": {
     "num_var": 2,
     "c": [[1, 2], [3, 1], [1, 1]],
     "q": [4, 5],
-    "T": 100,
+    "T": 500,
     "ub": [float("inf")] * 2,
     "lb": [0] * 2
 }}
@@ -109,16 +101,8 @@ GRADIENT_SPECS = {
         "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_1"]["num_con"]),
         "patience": 100,
         "delta": 0.000001,
-        "grad_iter_max": 5000,
-        "C": 0.5
-    },
-    "fun_2": {
-        "initial_vector": np.array([25] * PROBLEM_SPECS["fun_1"]["num_var"]),
-        "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_1"]["num_con"]),
-        "patience": 50,
-        "delta": 0.000001,
-        "grad_iter_max": 5000,
-        "C": 0.5
+        "grad_iter_max": 10000,
+        "C": 0.1
     },
     "fun_3": {
         "initial_vector": np.array([25] * PROBLEM_SPECS["fun_3"]["num_var"]),
@@ -133,22 +117,20 @@ GRADIENT_SPECS = {
         "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_4"]["num_con"]),
         "patience": 50,
         "delta": 0.000001,
-        "grad_iter_max": 5000,
-        "C": 0.5
+        "grad_iter_max": 10000,
+        "C": 0.1
     }}
 
 EVAL_SPECS = {
-    "fun_1": {"initial_vectors": [[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
-              "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1]},
-    "fun_2": {"initial_vectors": [[50, 50], [25, 25], [20, 20], [10, 10], [5, 5], [0, 0]],
-              "Cs": [10, 5, 1, 0.75, 0.5, 0.25, 0.1]},
+    "fun_1": {"initial_vectors": [[25, 25], [10, 10], [0, 0]],
+              "Cs": [1, 0.75, 0.5, 0.25, 0.1]},
     "fun_3": {"initial_vectors": [[25] * PROBLEM_SPECS["fun_3"]["num_var"],
-                                  [20] * PROBLEM_SPECS["fun_3"]["num_var"], [10] * PROBLEM_SPECS["fun_3"]["num_var"],
+                                  [10] * PROBLEM_SPECS["fun_3"]["num_var"], [0] * PROBLEM_SPECS["fun_3"]["num_var"],
                                   ],
-              "Cs": [5, 1, 0.75, 0.5, 0.25, 0.1]},
+              "Cs": [1, 0.75, 0.5, 0.25, 0.1]},
     "fun_4": {"initial_vectors": [[5] * PROBLEM_SPECS["fun_4"]["num_var"],
                                   [2.5] * PROBLEM_SPECS["fun_4"]["num_var"], [0] * PROBLEM_SPECS["fun_4"]["num_var"]],
-              "Cs": [5, 1, 0.75, 0.5, 0.25, 0.1, 0.01]},
+              "Cs": [1, 0.75, 0.5, 0.25, 0.1]},
 }
 
 

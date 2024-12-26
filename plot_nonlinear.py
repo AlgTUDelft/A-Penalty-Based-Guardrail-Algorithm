@@ -447,7 +447,7 @@ def evaluate_gdpa(T, betas, freq_s, path_r, path_w):
 
 
 if __name__ == "__main__":
-    function = "fun_5"
+    function = "fun_7"
     problem_spec = PROBLEM_SPECS[function]
     grad_spec = GRADIENT_SPECS[function]
     eval_spec = EVAL_SPECS[function]
@@ -457,6 +457,7 @@ if __name__ == "__main__":
         # Optional: add a name for this run
         name=f"optimization_run_{time.strftime('%Y%m%d_%H%M%S')}"
     )
+    """
     parameter_C(opt_names=["pm", "pga"], T=problem_spec["T"], Cs=eval_spec["Cs"],
                 path_r=Path("data/nonlinear").joinpath(function).joinpath("parameter_C"),
                 path_w=Path("plots/nonlinear").joinpath(function))
@@ -464,6 +465,7 @@ if __name__ == "__main__":
                    initial_vectors=[[25, 25], [0, 0], [-25, -25]], T=problem_spec["T"],
                    path_r=Path("data/nonlinear").joinpath(function).joinpath("initialization"),
                    path_w=Path("plots/nonlinear").joinpath(function), freq_s=10)
+    """
     objective_value(path_r=Path("data/nonlinear").joinpath(function),
                     path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
                     opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
@@ -471,6 +473,8 @@ if __name__ == "__main__":
                          path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
                          opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
     wandb.finish()
+    """
     evaluate_gdpa(T=problem_spec["T"], betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=10,
                   path_r=Path("data/nonlinear").joinpath(function).joinpath("evaluate_gdpa"),
                   path_w=Path("plots/nonlinear").joinpath(function))
+    """
