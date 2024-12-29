@@ -2,6 +2,7 @@ import numpy as np
 from algorithms_nonlinear import standard_penalty_alg, ipdd, gdpa, pga
 from helpers import save
 
+
 def evaluate_gdpa(problem_spec, grad_spec, beta_inits, gammas, path):
     for beta_init, gamma in zip(beta_inits, gammas):
         print("Beta ", beta_init)
@@ -10,13 +11,14 @@ def evaluate_gdpa(problem_spec, grad_spec, beta_inits, gammas, path):
         J_gdpa, constraint_values_gdpa, var_gdpa, runtime_gdpa = gdpa(
             problem_specs=problem_spec,
             grad_specs=grad_spec,
-            step_size_init=beta_init*gamma,
-            perturbation_term=beta_init*gamma,
+            step_size_init=beta_init * gamma,
+            perturbation_term=beta_init * gamma,
             beta_init=beta_init,
             gamma=gamma,
         )
         save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path,
              name="gdpa_beta_{}".format(beta_init), vars=var_gdpa)
+
 
 def initialization(problem_spec, grad_spec, initial_vectors, path):
     N_init = len(initial_vectors)
@@ -31,7 +33,7 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
         save(dict_=pm_lb_dict, J=J_pm_lb, f=constraint_values_pm_lb, runtime=runtime_pm_lb, path=path,
              name="pm_lb_init_" + suffix, vars=var_pm_lb)
         J_pm_ub, constraint_values_pm_ub, var_pm_ub, runtime_pm_ub = standard_penalty_alg(
-            problem_specs=problem_spec, grad_specs=grad_spec, C=1000
+            problem_specs=problem_spec, grad_specs=grad_spec, C=grad_spec["C_large"]
         )
         save(dict_=pm_ub_dict, J=J_pm_ub, f=constraint_values_pm_ub, runtime=runtime_pm_ub, path=path,
              name="pm_ub_init_" + suffix, vars=var_pm_ub)
@@ -43,10 +45,10 @@ def initialization(problem_spec, grad_spec, initial_vectors, path):
         J_gdpa, constraint_values_gdpa, var_gdpa, runtime_gdpa = gdpa(
             problem_specs=problem_spec,
             grad_specs=grad_spec,
-            step_size_init=0.891,
-            perturbation_term=0.891,
-            beta_init=0.9,
-            gamma=0.99,
+            step_size_init=grad_spec["step_size"],
+            perturbation_term=grad_spec["perturbation_term"],
+            beta_init=grad_spec["beta"],
+            gamma=grad_spec["gamma"],
         )
         save(dict_=gdpa_dict, J=J_gdpa, f=constraint_values_gdpa, runtime=runtime_gdpa, path=path,
              name="gdpa_init_" + suffix, vars=var_gdpa)

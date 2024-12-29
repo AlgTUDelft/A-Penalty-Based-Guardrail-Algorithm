@@ -77,6 +77,14 @@ PROBLEM_SPECS = {"fun_1": {
     "T": 500,
     "ub": [25] * 2,
     "lb": [0] * 2
+}, "fun_2": {
+    "num_con": 2,
+    "num_var": 2,
+    "c": [[1, 2], [3, 1], [1, 1]],
+    "q": [4, 5],
+    "T": 500,
+    "ub": [float("inf")] * 2,
+    "lb": [0] * 2
 }, "fun_3": {
     "num_con": 4,
     "num_var": 5,
@@ -85,14 +93,6 @@ PROBLEM_SPECS = {"fun_1": {
     "T": 500,
     "ub": [float("inf")] * 5,
     "lb": [0] * 5
-}, "fun_4": {
-    "num_con": 2,
-    "num_var": 2,
-    "c": [[1, 2], [3, 1], [1, 1]],
-    "q": [4, 5],
-    "T": 500,
-    "ub": [float("inf")] * 2,
-    "lb": [0] * 2
 }}
 
 GRADIENT_SPECS = {
@@ -102,7 +102,26 @@ GRADIENT_SPECS = {
         "patience": 100,
         "delta": 0.000001,
         "grad_iter_max": 10000,
-        "C": 0.1
+        "C": 0.1,
+        "C_large": 1000,
+        "beta": 0.25,
+        "gamma": 0.99,
+        "perturbation_term": 0.2475,
+        "step_size": 0.2475
+
+    },
+    "fun_2": {
+        "initial_vector": np.array([5] * PROBLEM_SPECS["fun_2"]["num_var"]),
+        "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_2"]["num_con"]),
+        "patience": 50,
+        "delta": 0.000001,
+        "grad_iter_max": 10000,
+        "C": 0.1,
+        "C_large": 1000,
+        "beta": 0.25,
+        "gamma": 0.99,
+        "perturbation_term": 0.2475,
+        "step_size": 0.2475
     },
     "fun_3": {
         "initial_vector": np.array([25] * PROBLEM_SPECS["fun_3"]["num_var"]),
@@ -110,28 +129,27 @@ GRADIENT_SPECS = {
         "patience": 50,
         "delta": 0.000001,
         "grad_iter_max": 10000,
-        "C": 0.1
-    },
-    "fun_4": {
-        "initial_vector": np.array([5] * PROBLEM_SPECS["fun_4"]["num_var"]),
-        "initial_lambdas": np.array([0] * PROBLEM_SPECS["fun_4"]["num_con"]),
-        "patience": 50,
-        "delta": 0.000001,
-        "grad_iter_max": 10000,
-        "C": 0.1
+        "C": 0.1,
+        "C_large": 1000,
+        "beta": 0.25,
+        "gamma": 0.99,
+        "perturbation_term": 0.2475,
+        "step_size": 0.2475
     }}
 
 EVAL_SPECS = {
     "fun_1": {"initial_vectors": [[25, 25], [10, 10], [0, 0]],
               "Cs": [1, 0.75, 0.5, 0.25, 0.1]},
+    "fun_2": {"initial_vectors": [[5] * PROBLEM_SPECS["fun_2"]["num_var"],
+                                  [2.5] * PROBLEM_SPECS["fun_2"]["num_var"], [0] * PROBLEM_SPECS["fun_2"]["num_var"]],
+              "Cs": [1, 0.75, 0.5, 0.25, 0.1]},
     "fun_3": {"initial_vectors": [[25] * PROBLEM_SPECS["fun_3"]["num_var"],
                                   [10] * PROBLEM_SPECS["fun_3"]["num_var"], [0] * PROBLEM_SPECS["fun_3"]["num_var"],
                                   ],
               "Cs": [1, 0.75, 0.5, 0.25, 0.1]},
-    "fun_4": {"initial_vectors": [[5] * PROBLEM_SPECS["fun_4"]["num_var"],
-                                  [2.5] * PROBLEM_SPECS["fun_4"]["num_var"], [0] * PROBLEM_SPECS["fun_4"]["num_var"]],
-              "Cs": [1, 0.75, 0.5, 0.25, 0.1]},
 }
+PLOT_SPECS = {"fun_1": {"lb_obj": -5, "ub_obj": 50}, "fun_2": {"lb_obj": 1, "ub_obj": 10},
+              "fun_3": {"lb_obj": 75, "ub_obj": 150}}
 
 
 def get_problem_spec(problem_name: str) -> Dict[str, Union[int, List[List[int]], List[int], float]]:

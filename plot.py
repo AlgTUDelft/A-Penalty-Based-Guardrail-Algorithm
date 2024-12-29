@@ -67,30 +67,30 @@ visualization_spec = {
 visualization_spec_init = {
     "mps": {"color": "#36FF33", "marker": "s", "linestyle": "solid", "label": r"$MPS(\mathbf{x}^0_{max})$",
             "markersize": 12},
-    "pm_lb_init_25_25_25_25_25": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
+    "pm_lb_init_5_5": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
                                   "label": r"$PM_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 12},
-    "pm_ub_init_25_25_25_25_25": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
+    "pm_ub_init_5_5": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
                                   "label": r"$PM_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 12},
-    "ipdd_init_25_25_25_25_25": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
+    "ipdd_init_5_5": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
                                  "label": r"$IPDD(\mathbf{x}^0_{max})$",
                                  "markersize": 15},
-    "gdpa_init_25_25_25_25_25": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
+    "gdpa_init_5_5": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
                                  "label": r"$GDPA(\mathbf{x}^0_{max})$",
                                  "markersize": 10},
-    "gdpa_init_20_20_20_20_20": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
+    "gdpa_init_2.5_2.5": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
                                  "label": r"$GDPA(\mathbf{x}^0_1)$", "markersize": 6},
-    "gdpa_init_10_10_10_10_10": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
-                                 "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
-    "pga_init_25_25_25_25_25": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
+    "gdpa_init_0_0": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
+                            "label": r"$GDPA(\mathbf{x}^0_2)$", "markersize": 6},
+    "pga_init_5_5": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
                                 "label": r"$PGA(\mathbf{x}^0_{max})$",
                                 "markersize": 10},
-    "pga_init_20_20_20_20_20": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
+    "pga_init_2.5_2.5": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
                                 "label": r"$PGA(\mathbf{x}^0_1)$", "markersize": 6},
-    "pga_init_10_10_10_10_10": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
-                                "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
+    "pga_init_0_0": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
+                           "label": r"$PGA(\mathbf{x}^0_2)$", "markersize": 6}}
 
 
-def objective_value(num_con, T, opt_name, path, path_w, function_name, freq_s):
+def objective_value(num_con, T, opt_name, path, path_w, function_name, freq_s, lb_obj, ub_obj):
     plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
@@ -120,11 +120,11 @@ def objective_value(num_con, T, opt_name, path, path_w, function_name, freq_s):
                 color=visualization_spec[opt]["color"],
                 linestyle=visualization_spec[opt]["linestyle"], )
     plt.xlim([0, T])
-    # plt.ylim([lower_bound, upper_bound])
-    plt.yscale("log")
-    plt.legend()
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.ylim([lb_obj, ub_obj])
+    # plt.yscale("log")
+    plt.legend(loc='upper right')
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("objective_value_" + function_name + ".svg"), format='svg')
     plt.show()
@@ -141,12 +141,8 @@ def constraint_violation(num_con, T, q, opt_name, path, path_w, function_name, f
             data = data.iloc[indices]
         opts[opt] = {"runtime": data["runtime"].tolist(), "f": []}
         f = data["f"].tolist()
-        # for i in range(len(f)):
-        #    opts[opt]["f"].append(abs(min(0, min(f[i]))))
-        f_array = np.array(f)
-        f_array[f_array >= 0] = 0
-        f = f_array.tolist()
-        opts[opt]["f"] = calculate_max_percent_f_and_q(f, q)
+        for i in range(len(f)):
+            opts[opt]["f"].append(abs(min(0, min(f[i]))))
     # objective function
     # plt.figure(figsize=(10, 5))
     for opt in opt_name:
@@ -169,9 +165,9 @@ def constraint_violation(num_con, T, q, opt_name, path, path_w, function_name, f
     plt.xlim([0, T])
     # plt.yscale("log")
     # plt.ylim([lower_bound, upper_bound])
-    plt.legend()
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.legend(loc='upper right')
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("constraint_violations_" + function_name + ".svg"), format='svg')
     plt.show()
@@ -196,11 +192,11 @@ def get_element_end_iteration(opt_name, path, initial_solutions):
     for initial_vector in initial_solutions:
         suffix = '_'.join(map(str, initial_vector))
         data = pd.read_json(path.joinpath(opt_name + "_init_" + suffix + ".json"))
-        print("Objective function value ", data["J"].tolist()[-1])
-        print("Constraint violation:", abs(max([x for x in data["f"].tolist()[-1] if x < 0] or [0])))
+    print("J ", data["J"].iloc[-1])
+    print("f ", data["f"].iloc[-1])
 
 
-def objective_value_initialization(num_con, T, opt_name, path, path_w, freq_s):
+def objective_value_initialization(num_con, T, opt_name, path, path_w, function_name, freq_s, lb_obj, ub_obj):
     plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
@@ -230,17 +226,17 @@ def objective_value_initialization(num_con, T, opt_name, path, path_w, freq_s):
                 color=visualization_spec_init[opt]["color"],
                 linestyle=visualization_spec_init[opt]["linestyle"], )
     plt.xlim([0, T])
-    # plt.ylim([lower_bound, upper_bound])
-    plt.yscale("log")
+    plt.ylim([lb_obj, ub_obj])
+    # plt.yscale("log")
     plt.legend(loc="upper right")
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
     plt.grid()
-    plt.savefig(path_w.joinpath("objective_value_init.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_init_" + function_name + ".svg"), format='svg')
     plt.show()
 
 
-def constraint_violation_initialization(num_con, T, opt_name, path, path_w, freq_s):
+def constraint_violation_initialization(num_con, T, opt_name, path, path_w, function_name, freq_s):
     plt.figure(figsize=(8, 6))
     opts = {}
     for opt in opt_name:
@@ -275,15 +271,15 @@ def constraint_violation_initialization(num_con, T, opt_name, path, path_w, freq
     plt.xlim([0, T])
     # plt.yscale("log")
     # plt.ylim([lower_bound, upper_bound])
-    plt.legend()
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.legend(loc='upper right')
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.grid()
-    plt.savefig(path_w.joinpath("constraint_violations_init.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_init_" + function_name + ".svg"), format='svg')
     plt.show()
 
 
-def parameter_C(opt_names, T, Cs, path_r, path_w):
+def parameter_C(opt_names, T, Cs, path_r, path_w, function_name, lb_obj, ub_obj):
     # Define colors and styles
     opts = ["#36FF33", "#B6C800", "#f119c3", "#0d5915", "#E31D1D", "#1c24dc"]
     if len(opts) < len(Cs):
@@ -331,11 +327,12 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     # Add Optimizers legend
     plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
 
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
+    # plt.ylim([lb_obj, ub_obj])
     plt.xlim([0, T])
     plt.grid()
-    plt.savefig(path_w.joinpath("objective_value_parameter_C.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_parameter_C_" + function_name + ".svg"), format='svg')
     plt.show()
 
     plt.figure(figsize=(12, 6))
@@ -377,15 +374,15 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     # Add Optimizers legend
     plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
 
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.xlim([0, T])
     plt.grid()
-    plt.savefig(path_w.joinpath("constraint_violations_parameter_C.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_parameter_C_" + function_name + ".svg"), format='svg')
     plt.show()
 
 
-def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w):
+def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w, lb_obj, ub_obj):
     styles = {
         0.9: {"color": "#E31D1D", "marker": "o", "linestyle": "solid", "label": r"$\beta=0.9$", "markersize": 7},
         0.75: {"color": "#36FF33", "marker": "^", "linestyle": linestyles["densely dashdotdotted"],
@@ -414,11 +411,11 @@ def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w):
                  markersize=styles[beta]["markersize"],
                  )
     plt.xlim([0, T])
-    # plt.ylim([lower_bound, upper_bound])
+    plt.ylim([lb_obj, ub_obj])
     # plt.yscale("log")
     plt.legend(loc='upper right')
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("objective_value_" + function + "_gdpa.svg"), format='svg')
     plt.show()
@@ -446,49 +443,51 @@ def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w):
                  markersize=styles[beta]["markersize"],
                  )
     plt.xlim([0, T])
-    # plt.ylim([lower_bound, upper_bound])
     # plt.yscale("log")
     plt.legend(loc='upper right')
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("constraint_violation_" + function + "_gdpa.svg"), format='svg')
     plt.show()
 
 
 if __name__ == "__main__":
-    function = "fun_3"
+    function = "fun_2"
+    lb_obj = PLOT_SPECS[function]["lb_obj"]
+    ub_obj = PLOT_SPECS[function]["ub_obj"]
+    freq_s = 20
     path_read: Path = Path("data").joinpath(function)
     path_write: Path = Path("plots").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
     eval_spec = get_eval_spec(function)
     opt_name = ["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"]
-    """
     objective_value(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
                     path_w=path_write, function_name=function,
-                    freq_s=10)
+                    freq_s=freq_s, lb_obj=lb_obj, ub_obj=ub_obj)
     constraint_violation(num_con=problem_spec["num_con"], T=problem_spec["T"], q=problem_spec["q"], opt_name=opt_name,
                          path=path_read,
                          path_w=path_write, function_name=function,
-                         freq_s=10)
+                         freq_s=freq_s)
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
-                                                opt_names_init=["mps", "pm_lb_init_25_25_25_25_25",
-                                                                "pm_ub_init_25_25_25_25_25",
-                                                                "ipdd_init_25_25_25_25_25"],
-                                                initializations=[[25, 25, 25, 25, 25], [20, 20, 20, 20, 20],
-                                                                 [10, 10, 10, 10, 10]])
+                                                opt_names_init=["mps", "pm_lb_init_5_5",
+                                                                "pm_ub_init_5_5",
+                                                                "ipdd_init_5_5"],
+                                                initializations=[[5, 5],
+                                                                 [2.5, 2.5], [0, 0]])
     objective_value_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
-                                   path=path_read.joinpath("initialization"), path_w=path_write,
-                                   freq_s=10)
+                                   path=path_read.joinpath("initialization"), path_w=path_write, function_name=function,
+                                   freq_s=freq_s, lb_obj=lb_obj, ub_obj=ub_obj)
     constraint_violation_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
                                         path=path_read.joinpath("initialization"), path_w=path_write,
-                                        freq_s=10)
+                                        function_name=function,
+                                        freq_s=freq_s)
     get_element_end_iteration(opt_name="pm_ub", path=path_read.joinpath("initialization"),
                               initial_solutions=eval_spec["initial_vectors"])
-    parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[5, 1, 0.75, 0.5, 0.25, 0.1],
-                path_r=path_read.joinpath("parameter_C"), path_w=path_write)
-    """
-    evaluate_gdpa(T=problem_spec["T"], function=function, betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=10,
+    parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[1, 0.75, 0.5, 0.25, 0.1],
+                path_r=path_read.joinpath("parameter_C"), path_w=path_write, function_name=function, lb_obj=lb_obj,
+                ub_obj=ub_obj)
+    evaluate_gdpa(T=problem_spec["T"], function=function, betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=freq_s,
                   path_r=Path("data").joinpath(function).joinpath("evaluate_gdpa"),
-                  path_w=Path("plots").joinpath(function))
+                  path_w=Path("plots").joinpath(function), lb_obj=lb_obj, ub_obj=ub_obj)

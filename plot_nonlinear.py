@@ -78,7 +78,7 @@ def form_optimizers_init_names(opt_names, initial_vectors):
     return r
 
 
-def objective_value(path_r, path_w, T, opt_name, function_name, freq_s):
+def objective_value(path_r, path_w, T, opt_name, function_name, freq_s, lb_obj, ub_obj):
     # setting KMP_DUPLICATE_LIB_OK=TRUE is used to prevent the error: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
     # this environment variable is set only after program execution in order to avoid interfering with this execution.
     # import os
@@ -112,11 +112,11 @@ def objective_value(path_r, path_w, T, opt_name, function_name, freq_s):
                 color=visualization_spec[opt]["color"],
                 linestyle=visualization_spec[opt]["linestyle"], )
     plt.xlim([0, T])
-    # plt.ylim([lower_bound, upper_bound])
+    plt.ylim([lb_obj, ub_obj])
     # plt.yscale("log")
     plt.legend()
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
     plt.grid()
 
     path_w_png = path_w.joinpath("objective_value_" + function_name + ".png")
@@ -173,11 +173,11 @@ def constraint_violation(path_r, path_w, T, opt_name, function_name, freq_s):
                 color=visualization_spec[key]["color"],
                 linestyle=visualization_spec[key]["linestyle"], )
     plt.xlim([0, T])
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.legend()
     plt.grid()
-    plt.xlim([0, T])
+    # plt.xlim([0, T])
     # plt.yscale("log")
     # plt.ylim([lower_bound, upper_bound])
     path_w_png = path_w.joinpath("constraint_violations_" + function_name + ".png")
@@ -204,7 +204,7 @@ def constraint_violation(path_r, path_w, T, opt_name, function_name, freq_s):
     })
 
 
-def parameter_C(opt_names, T, Cs, path_r, path_w):
+def parameter_C(opt_names, T, Cs, path_r, path_w, function_name):
     # Define colors and styles
     opts = ["#36FF33", "#B6C800", "#f119c3", "#0d5915", "#E31D1D", "#1c24dc"]
     if len(opts) < len(Cs):
@@ -252,11 +252,11 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     # Add Optimizers legend
     plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
 
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
     plt.xlim([0, T])
     plt.grid()
-    plt.savefig(path_w.joinpath("objective_value_parameter_C.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_parameter_C_" + function_name + ".svg"), format='svg')
     plt.show()
 
     plt.figure(figsize=(12, 6))
@@ -270,7 +270,6 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
             data = pd.read_json(filepath)
             constraint_violations = []
             f = data["f"].tolist()
-            print("param C f ", f)
             for i in range(len(f)):
                 constraint_violations.append(abs(min(0, min(f[i]))))
 
@@ -299,15 +298,15 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     # Add Optimizers legend
     plt.legend(handles=opt_legend, title='Optimizers', loc='upper right')
 
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.xlim([0, T])
     plt.grid()
-    plt.savefig(path_w.joinpath("constraint_violations_parameter_C.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_parameter_C_" + function_name + ".svg"), format='svg')
     plt.show()
 
 
-def initialization(opt_names, initial_vectors, T, path_r, path_w, freq_s):
+def initialization(opt_names, initial_vectors, T, path_r, path_w, freq_s, function_name):
     opt_names_init = form_optimizers_init_names(opt_names=opt_names, initial_vectors=initial_vectors)
     plt.figure(figsize=(8, 6))
     opts = {}
@@ -346,10 +345,10 @@ def initialization(opt_names, initial_vectors, T, path_r, path_w, freq_s):
     plt.xlim([0, T])
     # plt.ylim([lower_bound, upper_bound])
     plt.legend(loc="upper right")
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
     plt.grid()
-    plt.savefig(path_w.joinpath("objective_value_init.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_init_" + function_name + ".svg"), format='svg')
     plt.show()
 
     for opt in opt_names_init:
@@ -372,14 +371,14 @@ def initialization(opt_names, initial_vectors, T, path_r, path_w, freq_s):
     plt.xlim([0, T])
     # plt.ylim([lower_bound, upper_bound])
     plt.legend(loc="upper right")
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.grid()
-    plt.savefig(path_w.joinpath("constraint_violation_init.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violation_init_" + function_name + ".svg"), format='svg')
     plt.show()
 
 
-def evaluate_gdpa(T, betas, freq_s, path_r, path_w):
+def evaluate_gdpa(T, betas, freq_s, path_r, path_w, function_name):
     styles = {
         0.9: {"color": "#E31D1D", "marker": "o", "linestyle": "solid", "label": r"$\beta=0.9$", "markersize": 7},
         0.75: {"color": "#36FF33", "marker": "^", "linestyle": linestyles["densely dashdotdotted"],
@@ -409,10 +408,10 @@ def evaluate_gdpa(T, betas, freq_s, path_r, path_w):
     # plt.ylim([lower_bound, upper_bound])
     # plt.yscale("log")
     plt.legend(loc='upper right')
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Objective value", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Objective value", fontsize=15)
     plt.grid()
-    plt.savefig(path_w.joinpath("objective_value_gdpa.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_gdpa_" + function_name + ".svg"), format='svg')
     plt.show()
 
     plt.figure(figsize=(8, 6))
@@ -439,15 +438,18 @@ def evaluate_gdpa(T, betas, freq_s, path_r, path_w):
     # plt.ylim([lower_bound, upper_bound])
     # plt.yscale("log")
     plt.legend(loc='upper right')
-    plt.xlabel("Computational time [s]", fontsize=14)
-    plt.ylabel("Constraint violation", fontsize=14)
+    plt.xlabel("Computational time [s]", fontsize=15)
+    plt.ylabel("Constraint violation", fontsize=15)
     plt.grid()
-    plt.savefig(path_w.joinpath("constraint_violation_gdpa.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violation_gdpa_" + function_name + ".svg"), format='svg')
     plt.show()
 
 
 if __name__ == "__main__":
-    function = "fun_7"
+    function = "fun_4"
+    freq_s = 20
+    lb_obj = PLOT_SPECS[function]["lb_obj"]
+    ub_obj = PLOT_SPECS[function]["ub_obj"]
     problem_spec = PROBLEM_SPECS[function]
     grad_spec = GRADIENT_SPECS[function]
     eval_spec = EVAL_SPECS[function]
@@ -457,24 +459,23 @@ if __name__ == "__main__":
         # Optional: add a name for this run
         name=f"optimization_run_{time.strftime('%Y%m%d_%H%M%S')}"
     )
-    """
     parameter_C(opt_names=["pm", "pga"], T=problem_spec["T"], Cs=eval_spec["Cs"],
                 path_r=Path("data/nonlinear").joinpath(function).joinpath("parameter_C"),
-                path_w=Path("plots/nonlinear").joinpath(function))
+                path_w=Path("plots/nonlinear").joinpath(function), function_name=function)
     initialization(opt_names=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
-                   initial_vectors=[[25, 25], [0, 0], [-25, -25]], T=problem_spec["T"],
+                   initial_vectors=[[25] * problem_spec["num_var"], [0] * problem_spec["num_var"],
+                                    [-25] * problem_spec["num_var"]], T=problem_spec["T"],
                    path_r=Path("data/nonlinear").joinpath(function).joinpath("initialization"),
-                   path_w=Path("plots/nonlinear").joinpath(function), freq_s=10)
-    """
+                   path_w=Path("plots/nonlinear").joinpath(function), freq_s=freq_s, function_name=function)
     objective_value(path_r=Path("data/nonlinear").joinpath(function),
                     path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
-                    opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
+                    opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=freq_s,
+                    lb_obj=lb_obj, ub_obj=ub_obj)
     constraint_violation(path_r=Path("data/nonlinear").joinpath(function),
                          path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],
-                         opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function, freq_s=10)
+                         opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"], function_name=function,
+                         freq_s=freq_s)
     wandb.finish()
-    """
-    evaluate_gdpa(T=problem_spec["T"], betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=10,
+    evaluate_gdpa(T=problem_spec["T"], betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=freq_s,
                   path_r=Path("data/nonlinear").joinpath(function).joinpath("evaluate_gdpa"),
-                  path_w=Path("plots/nonlinear").joinpath(function))
-    """
+                  path_w=Path("plots/nonlinear").joinpath(function), function_name=function)
