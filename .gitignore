@@ -1,9 +1,9 @@
 *.xml
 *.iml
 *.pyc
-*.svg
-*.json
+#*.svg
+#*.json
 *.log
 *.yaml
-*.png
+#*.png
 *.wandb

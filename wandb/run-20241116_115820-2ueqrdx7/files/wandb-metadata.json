@@ -1,0 +1,32 @@
+{
+  "os":  "Windows-10-10.0.19045-SP0",
+  "python":  "3.9.16",
+  "startedAt":  "2024-11-16T10:58:20.641930Z",
+  "program":  "C:\\Users\\kstepanovic\\OneDrive - Delft University of Technology\\Desktop\\A-Penalty-Based-Guardrail-Algorithm\\algorithms_nonlinear.py",
+  "codePath":  "algorithms_nonlinear.py",
+  "git":  {
+    "remote":  "https://github.com/KStepanovic1/A-Penalty-Based-Guardrail-Algorithm.git",
+    "commit":  "3fa319c8087b538969bcdb654a5d12301b5588bc"
+  },
+  "email":  "k.stepanovic@tudelft.nl",
+  "root":  "C:\\Users\\kstepanovic\\OneDrive - Delft University of Technology\\Desktop\\A-Penalty-Based-Guardrail-Algorithm",
+  "host":  "TUD258870",
+  "username":  "kstepanovic",
+  "executable":  "C:\\Users\\kstepanovic\\Miniconda3\\python.exe",
+  "codePathLocal":  "algorithms_nonlinear.py",
+  "cpu_count":  4,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "510583934976",
+      "used":  "356435488768"
+    }
+  },
+  "memory":  {
+    "total":  "8391184384"
+  },
+  "cpu":  {
+    "count":  4,
+    "countLogical":  8
+  }
+}
