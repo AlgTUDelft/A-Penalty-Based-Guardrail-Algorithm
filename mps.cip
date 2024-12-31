@@ -1,27 +1,23 @@
 STATISTICS
   Problem name     : MPS
-  Variables        : 7 (1 binary, 0 integer, 0 implicit integer, 6 continuous)
-  Constraints      : 0 initial, 11 maximal
+  Variables        : 7 (0 binary, 0 integer, 0 implicit integer, 7 continuous)
+  Constraints      : 0 initial, 7 maximal
 OBJECTIVE
   Sense            : minimize
 VARIABLES
-  [binary] <relu_active_0_0>: obj=0, original bounds=[0,1]
-  [continuous] <x(1)>: obj=0, original bounds=[0,25]
+  [continuous] <x(0)>: obj=0, original bounds=[-25,25]
+  [continuous] <x(1)>: obj=0, original bounds=[-25,25]
   [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
-  [continuous] <x(0)>: obj=0, original bounds=[0,25]
-  [continuous] <relu_output_0_0>: obj=0, original bounds=[0,+inf]
+  [continuous] <layer_0_neuron_1>: obj=0, original bounds=[-inf,+inf]
+  [continuous] <layer_1_neuron_0>: obj=0, original bounds=[-inf,+inf]
   [continuous] <layer_0_neuron_0>: obj=0, original bounds=[-inf,+inf]
   [continuous] <J>: obj=1, original bounds=[-inf,+inf]
 CONSTRAINTS
-  [linear] <c1>:  +2<x(0)>[C] +<x(1)>[C] -10000<relu_active_0_0>[B] <= 0;
-  [linear] <c2>:  +2<x(0)>[C] +<x(1)>[C] -10000<relu_active_0_0>[B] >= -10000;
-  [linear] <c3>: <relu_output_0_0>[C] -2<x(0)>[C] -<x(1)>[C] >= 0;
-  [linear] <c4>: <relu_output_0_0>[C] -2<x(0)>[C] -<x(1)>[C] +10000<relu_active_0_0>[B] <= 10000;
-  [linear] <c5>: <relu_output_0_0>[C] >= 0;
-  [linear] <c6>: <relu_output_0_0>[C] -10000<relu_active_0_0>[B] <= 0;
-  [linear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>[C] -<relu_output_0_0>[C] == 0;
-  [linear] <constraint(0)>: <layer_0_neuron_0>[C] >= 1;
-  [nonlinear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>+(exp((<x(0)>+<x(1)>*4))+exp((<x(0)>*(-1)+<x(1)>*(-4)))*(-1))*((exp((<x(0)>+<x(1)>*4))+exp((<x(0)>*(-1)+<x(1)>*(-4)))))^(-1)*(-1) == 0;
-  [linear] <constraint(1)>: <layer_0_neuron_0>[C] >= 0.5;
+  [nonlinear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>+((exp((<x(0)>*(-0.2)+<x(1)>*(-0.5)))+1))^(-1)*(-1) == 0;
+  [nonlinear] <layer_0_neuron_1_constraint>: <layer_0_neuron_1>+((exp((<x(0)>*(-0.5)+<x(1)>*(-0.7)))+1))^(-1)*(-1) == 0;
+  [linear] <layer_1_neuron_0_constraint>: <layer_1_neuron_0>[C] -2<layer_0_neuron_0>[C] -3<layer_0_neuron_1>[C] == 0;
+  [linear] <constraint(0)>: <layer_1_neuron_0>[C] >= 4;
+  [nonlinear] <layer_0_neuron_0_constraint>: <layer_0_neuron_0>+(exp((<x(0)>+<x(1)>*2))+exp((<x(0)>*(-1)+<x(1)>*(-2)))*(-1))*((exp((<x(0)>+<x(1)>*2))+exp((<x(0)>*(-1)+<x(1)>*(-2)))))^(-1)*(-1) == 0;
+  [linear] <constraint(1)>: <layer_0_neuron_0>[C] >= 1;
   [linear] <objective_function_constraint>: <J>[C] -<x(0)>[C] -<x(1)>[C] >= 0;
 END

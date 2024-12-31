@@ -7,3 +7,4 @@
 *.yaml
 #*.png
 *.wandb
+wandb/

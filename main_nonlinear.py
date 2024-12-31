@@ -7,7 +7,7 @@ from optimization_specs_nonlinear import *
 from eval_nonlinear import parameter_C, initialization, evaluate_gdpa
 
 if __name__ == "__main__":
-    functions = ["fun_5", "fun_6", "fun_7", "fun_8"]
+    functions = ["fun_8"]
     for function in functions:
         path: Path = Path("data/nonlinear").joinpath(function)
         problem_spec = PROBLEM_SPECS[function]

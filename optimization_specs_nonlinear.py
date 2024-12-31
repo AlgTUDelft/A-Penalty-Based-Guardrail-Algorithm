@@ -295,4 +295,6 @@ EVAL_SPECS = {
 
 }
 
-PLOT_SPECS = {"fun_4": {"lb_obj": -100, "ub_obj": 100}}
+PLOT_SPECS = {"fun_4": {"lb_obj": -100, "ub_obj": 100}, "fun_5": {"lb_obj": -10, "ub_obj": 30},
+              "fun_7": {"lb_obj": -800, "ub_obj": 200}, "fun_6": {"lb_obj": -2, "ub_obj": 10},
+              "fun_8": {"lb_obj": -60, "ub_obj": 40}}
