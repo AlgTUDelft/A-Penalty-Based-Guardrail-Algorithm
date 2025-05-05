@@ -1,1 +1,0 @@
-{"columns": ["method", "objective", "runtime"], "data": [["mps", "d", "d"], ["pm_lb", "i", "i"], ["pm_ub", "c", "c"], ["ipdd", "t", "t"], ["gdpa", "_", "_"], ["pga", "v", "v"]]}
