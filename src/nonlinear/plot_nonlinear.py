@@ -1,12 +1,8 @@
-import wandb
 import matplotlib.pyplot as plt
-import time
-import numpy as np
 import pandas as pd
-from pathlib import Path
 from collections import OrderedDict
 
-from optimization_specs_nonlinear import *
+from src.nonlinear.optimization_specs_nonlinear import *
 
 linestyles = OrderedDict(
     [('solid', (0, ())),
@@ -496,7 +492,7 @@ if __name__ == "__main__":
     problem_spec = PROBLEM_SPECS[function]
     grad_spec = GRADIENT_SPECS[function]
     eval_spec = EVAL_SPECS[function]
-    get_element_end_iteration(opt_name="pga", path=Path("data/nonlinear").joinpath(function), initial_solutions="")
+    get_element_end_iteration(opt_name="pga", path=Path("../../data/nonlinear").joinpath(function), initial_solutions="")
     """
     wandb.init(
         project="nonlinear_optimization",
@@ -511,8 +507,8 @@ if __name__ == "__main__":
     initialization(opt_names=["pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
                    initial_vectors=[[25] * problem_spec["num_var"], [0] * problem_spec["num_var"],
                                     [-25] * problem_spec["num_var"]], T=problem_spec["T"],
-                   path_r=Path("data/nonlinear").joinpath(function).joinpath("initialization"),
-                   path_w=Path("plots/nonlinear").joinpath(function), freq_s=freq_s, function_name=function)
+                   path_r=Path("../../data/nonlinear").joinpath(function).joinpath("initialization"),
+                   path_w=Path("../../plots/nonlinear").joinpath(function), freq_s=freq_s, function_name=function)
     """
     objective_value(path_r=Path("data/nonlinear").joinpath(function),
                     path_w=Path("plots/nonlinear").joinpath(function), T=problem_spec["T"],

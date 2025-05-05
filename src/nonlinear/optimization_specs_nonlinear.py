@@ -180,7 +180,7 @@ PROBLEM_SPECS = {
                                       num_neuron_per_layer=[[3, 2, 1], [1], [2, 1], [2, 2, 1], [1]],
                                       activation_fun=[["relu", "selu", "relu"], ["elu"], ["relu", "leaky_relu"],
                                                       ["elu", "relu", "selu"], ["relu"]], T=500,
-                                      path=Path("../data/nonlinear/fun_7").joinpath("fun_7.pickle")),
+                                      path=Path("../../data/nonlinear/fun_7").joinpath("fun_7.pickle")),
     "fun_8": {
         "num_var": 2,
         "num_con": 2,

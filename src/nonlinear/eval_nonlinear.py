@@ -1,5 +1,5 @@
 import numpy as np
-from src.algorithms_nonlinear import standard_penalty_alg, gdpa, pga
+from src.nonlinear.algorithms_nonlinear import standard_penalty_alg, gdpa, pga
 from helpers import save
 
 

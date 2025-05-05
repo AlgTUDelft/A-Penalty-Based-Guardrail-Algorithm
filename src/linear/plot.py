@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.optimization_specs import *
+from src.linear.optimization_specs import *
 from collections import OrderedDict
 
 
@@ -479,8 +479,8 @@ if __name__ == "__main__":
     lb_obj = PLOT_SPECS[function]["lb_obj"]
     ub_obj = PLOT_SPECS[function]["ub_obj"]
     freq_s = 20
-    path_read: Path = Path("../data").joinpath(function)
-    path_write: Path = Path("../plots").joinpath(function)
+    path_read: Path = Path("../../data").joinpath(function)
+    path_write: Path = Path("../../plots").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
     eval_spec = get_eval_spec(function)

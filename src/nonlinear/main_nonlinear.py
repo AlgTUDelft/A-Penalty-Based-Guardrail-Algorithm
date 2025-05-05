@@ -1,5 +1,5 @@
 from optimization_specs_nonlinear import *
-from src.eval_nonlinear import parameter_C
+from src.nonlinear.eval_nonlinear import parameter_C
 
 if __name__ == "__main__":
     functions = ["fun_4", "fun_8"]
