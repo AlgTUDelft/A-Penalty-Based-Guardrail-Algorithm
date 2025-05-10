@@ -10,9 +10,9 @@ from keras.callbacks import EarlyStopping
 from keras import backend as K
 from keras.constraints import NonNeg
 
-from tensor_constraint import ParNonNeg
-from param import OutputDNNParam
-from nn import NN
+from src.dnn.tensor_constraint import ParNonNeg
+from src.dnn.param import OutputDNNParam
+from src.dnn.nn import NN
 
 
 class Output(NN):

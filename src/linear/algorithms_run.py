@@ -1,14 +1,15 @@
-from src.eval import *
+from src.linear.eval import *
+from src.linear.algorithms import *
+from src.helpers import *
 
-if __name__ == "__main__":
-    functions = ["fun_1", "fun_2", "fun_3"]
+
+def run(functions):
     for function in functions:
         path: Path = Path("../data").joinpath(function)
         problem_spec = get_problem_spec(function)
         grad_spec = get_grad_spec(function)
         eval_spec = get_eval_spec(function)
         mps_dict, pm_lb_dict, pm_ub_dict, ipdd_dict, gdpa_dict, pga_dict = {}, {}, {}, {}, {}, {}
-        """
         var_mps, J_mps, constraint_values_mps, runtime_mps = mps(num_var=problem_spec["num_var"],
                                                                  num_con=problem_spec["num_con"], c=problem_spec["c"],
                                                                  q=problem_spec["q"],
@@ -85,10 +86,12 @@ if __name__ == "__main__":
         save(dict_=pga_dict, J=J_pga, f=constraint_values_pga, runtime=runtime_pga, path=path, name="pga", vars=var_pga)
         initialization(problem_spec, grad_spec, initial_vectors=eval_spec["initial_vectors"],
                        path=path.joinpath("initialization"))
-        """
         parameter_C(problem_spec=problem_spec, grad_spec=grad_spec, Cs=eval_spec["Cs"],
                     path=path.joinpath("parameter_C"))
-        """
         evaluate_gdpa(problem_spec=problem_spec, grad_spec=grad_spec, beta_inits=[0.9, 0.75, 0.5, 0.25, 0.1],
                       gammas=[0.99, 0.99, 0.99, 0.99, 0.99], path=path.joinpath("evaluate_gdpa"))
-        """
+
+
+if __name__ == "__main__":
+    functions = ["fun_1", "fun_2", "fun_3"]
+    run(functions=functions)

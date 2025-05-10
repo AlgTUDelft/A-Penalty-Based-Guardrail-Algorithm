@@ -3,22 +3,23 @@ from datetime import datetime
 import statistics
 import pandas as pd
 
-from grid_config import PipePreset
-from param import StatePar, OutputPar
-from prediction import (
+from src.dnn.grid_config import PipePreset
+from src.dnn.param import StatePar, OutputPar
+from src.dnn.prediction import (
     multi_step_prediction,
     save_loss,
 )
-from state import StateDNN
-from output import OutputDNN
-from nn import NN
+from src.dnn.state import StateDNN
+from src.dnn.output import OutputDNN
+from src.dnn.nn import NN
 
-if __name__ == "__main__":
+
+def run() -> None:
     now = datetime.now()
     date_time_str = now.strftime("%m-%d")
     predictions_p: Path = Path(__file__).parents[1] / "data/dnn/predictions"
     models_p: Path = Path(__file__).parents[1] / "data/dnn/models"
-    num_run = 1 # number of runs
+    num_run = 1  # number of runs
     layer_sizes = [[1, 1]]
     time_delay: int = PipePreset["time_delay"]  # number of previous actions
     time_delay_q: int = PipePreset["time_delay_q"]  # number of previous heat demands
@@ -105,8 +106,8 @@ if __name__ == "__main__":
                 else:
                     warm_up_ext = ""
                 state = StateDNN(
-                    result_p=s_par.result_p, #global result path
-                    model_p=s_par.model_p, #model path
+                    result_p=s_par.result_p,  # global result path
+                    model_p=s_par.model_p,  # model path
                     time_delay=s_par.time_delay,
                     time_delay_q=s_par.time_delay_q,
                     columns=s_par.columns,
@@ -250,16 +251,16 @@ if __name__ == "__main__":
                     "prediction_"
                     + "one_step_"
                     + NN.neurons_ext(s_par.layer_size)
-                    + "_"+date_time_str
+                    + "_" + date_time_str
                     + ".csv"
                 )
             )
             err_multi_step.to_csv(
-               predictions_p.joinpath(
+                predictions_p.joinpath(
                     "prediction_"
                     + "multi_step_"
                     + NN.neurons_ext(s_par.layer_size)
-                    + "_"+date_time_str
+                    + "_" + date_time_str
                     + ".csv"
                 )
             )
@@ -288,3 +289,7 @@ if __name__ == "__main__":
                 )
             print(output + " error {:.6f}".format(statistics.mean(y_par.err[output])))
     """
+
+
+if __name__ == "__main__":
+    run()

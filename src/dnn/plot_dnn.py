@@ -105,6 +105,7 @@ def objective_value_dnn(num_con, T, opt_name, path, path_w, function_name, freq_
     plt.ylabel(r"Objective value [€]", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("objective_value_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_" + function_name + ".eps"), format='eps')
     plt.show()
 
 
@@ -155,6 +156,7 @@ def constraint_violation_dnn(num_con, T, q, opt_name, path, path_w, function_nam
     plt.ylabel("Constraint violation [MW]", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("constraint_violations_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_" + function_name + ".eps"), format='eps')
     plt.show()
 
 
@@ -210,7 +212,7 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     plt.ylabel("Objective value", fontsize=15)
     plt.xlim([0, T])
     plt.grid()
-    plt.savefig(path_w.joinpath("objective_value_parameter_C_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_parameter_C_" + ".svg"), format='svg')
     plt.show()
 
     plt.figure(figsize=(12, 6))
@@ -256,20 +258,24 @@ def parameter_C(opt_names, T, Cs, path_r, path_w):
     plt.ylabel("Constraint violation", fontsize=15)
     plt.xlim([0, T])
     plt.grid()
-    plt.savefig(path_w.joinpath("constraint_violations_parameter_C_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_parameter_C_" + ".svg"), format='svg')
     plt.show()
 
 
-if __name__ == "__main__":
+def plot():
     objective_value_dnn(num_con=1, T=500, opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
-                        path=Path("../../data").joinpath(""),
-                        path_w=Path("../../plots").joinpath(""), function_name="dnn",
+                        path=Path("../data/dnn").joinpath(""),
+                        path_w=Path("../plots/dnn").joinpath(""), function_name="dnn",
                         freq_s=10)
 
     constraint_violation_dnn(num_con=1, T=500, q=[0], opt_name=["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"],
-                             path=Path("../../data").joinpath(""),
-                             path_w=Path("../../plots").joinpath(""), function_name="dnn",
+                             path=Path("../data/dnn").joinpath(""),
+                             path_w=Path("../plots/dnn").joinpath(""), function_name="dnn",
                              freq_s=10)
-    parameter_C(opt_names=["pm", "pga"], T=500, Cs=[1, 0.75, 0.5, 0.25, 0.1],
-                path_r=Path("../../data/dnn").joinpath("parameter_C"),
-                path_w=Path("../../plots/dnn"))
+    # parameter_C(opt_names=["pm", "pga"], T=500, Cs=[1, 0.75, 0.5, 0.25, 0.1],
+    #            path_r=Path("../../data/dnn").joinpath("parameter_C"),
+    #            path_w=Path("../../plots/dnn"))
+
+
+if __name__ == "__main__":
+    plot()

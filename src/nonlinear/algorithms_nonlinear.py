@@ -1,7 +1,7 @@
 from pyscipopt import Model, quicksum, multidict, exp
 import tensorflow as tf
 import time
-from helpers import *
+from src.helpers import *
 
 
 def sigmoid(x):

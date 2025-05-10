@@ -8,9 +8,9 @@ from keras import regularizers
 from keras.callbacks import EarlyStopping
 from keras.constraints import NonNeg
 
-from tensor_constraint import ParNonNeg
-from param import StateDNNParam
-from nn import NN
+from src.dnn.tensor_constraint import ParNonNeg
+from src.dnn.param import StateDNNParam
+from src.dnn.nn import NN
 
 
 class State(NN):

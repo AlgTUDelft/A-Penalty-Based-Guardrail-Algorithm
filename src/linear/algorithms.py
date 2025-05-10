@@ -1,9 +1,9 @@
 import time
 from pyscipopt import Model, exp, quicksum
 import tensorflow as tf
-from helpers import *
-from optimization_specs import *
-from dnn.tf_functions import *
+from src.helpers import *
+from src.linear.optimization_specs import *
+from src.dnn.tf_functions import *
 
 
 def mps(num_var, num_con, c, q, ub, lb, T):

@@ -8,9 +8,9 @@ from sklearn.metrics import mean_squared_error
 from keras.models import load_model
 import pickle
 import warnings
-from tensor_constraint import ParNonNeg
+from src.dnn.tensor_constraint import ParNonNeg
 
-from grid_config import GridProperties, ProducerPreset, PipePreset
+from src.dnn.grid_config import GridProperties, ProducerPreset, PipePreset
 
 class NN(ABC):
     def __init__(self, model_p, normalize, warm_up, warm_up_ext):

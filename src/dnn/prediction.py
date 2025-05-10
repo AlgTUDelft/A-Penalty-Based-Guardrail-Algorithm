@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from sklearn.metrics import mean_squared_error
-from grid_config import PhysicalProperties, ConsumerPreset1
+from src.dnn.grid_config import PhysicalProperties, ConsumerPreset1
 
-from nn import NN
+from src.dnn.nn import NN
 
 
 def verification_rmse(s_scaled, y_scaled, T, scaler_s, scaler_y):

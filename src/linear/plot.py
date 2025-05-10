@@ -64,41 +64,41 @@ visualization_spec = {
 visualization_spec_init = {
     "mps": {"color": "#36FF33", "marker": "s", "linestyle": "solid", "label": r"$MPS(\mathbf{x}^0_{max})$",
             "markersize": 12},
-    "pm_lb_init_25_25_25_25_25": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
-                       "label": r"$PA_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 10},
-    "pm_lb_init_10_10_10_10_10": {"color": "#b8c348", "marker": "^", "linestyle": linestyles["loosely dotted"],
-                           "label": r"$PA_{C\searrow}(\mathbf{x}^0_{median})$", "markersize": 6},
-    "pm_lb_init_0_0_0_0_0": {"color": "#bec291", "marker": "^", "linestyle": linestyles["loosely dashed"],
-                       "label": r"$PA_{C\searrow}(\mathbf{x}^0_{min})$", "markersize": 6},
-    "pm_ub_init_25_25_25_25_25": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
-                       "label": r"$PA_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 10},
-    "pm_ub_init_10_10_10_10_10": {"color": "#f190dd", "marker": "v", "linestyle": linestyles["loosely dotted"],
-                           "label": r"$PA_{C\nearrow}(\mathbf{x}^0_{median})$", "markersize": 6},
-    "pm_ub_init_0_0_0_0_0": {"color": "#ecc0e3", "marker": "v", "linestyle": linestyles["loosely dashed"],
-                       "label": r"$PA_{C\nearrow}(\mathbf{x}^0_{min})$", "markersize": 6},
-    "ipdd_init_25_25_25_25_25": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
-                      "label": r"$IPDD(\mathbf{x}^0_{max})$",
-                      "markersize": 10},
-    "ipdd_init_10_10_10_10_10": {"color": "#6ec977", "marker": "2", "linestyle": linestyles["loosely dotted"],
-                          "label": r"$IPDD(\mathbf{x}^0_{median})$",
-                          "markersize": 6},
-    "ipdd_init_0_0_0_0_0": {"color": "#96f6a0", "marker": "2", "linestyle": linestyles["loosely dashed"],
-                      "label": r"$IPDD(\mathbf{x}^0_{min})$",
-                      "markersize": 6},
-    "gdpa_init_25_25_25_25_25": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
-                      "label": r"$GDPA(\mathbf{x}^0_{max})$",
-                      "markersize": 10},
-    "gdpa_init_10_10_10_10_10": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
-                          "label": r"$GDPA(\mathbf{x}^0_{median})$", "markersize": 6},
-    "gdpa_init_0_0_0_0_0": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
-                      "label": r"$GDPA(\mathbf{x}^0_{min})$", "markersize": 6},
-    "pga_init_25_25_25_25_25": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
-                     "label": r"$PGA(\mathbf{x}^0_{max})$",
-                     "markersize": 10},
-    "pga_init_10_10_10_10_10": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
-                         "label": r"$PGA(\mathbf{x}^0_{median})$", "markersize": 6},
-    "pga_init_0_0_0_0_0": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
-                     "label": r"$PGA(\mathbf{x}^0_{min})$", "markersize": 6}}
+    "pm_lb_init_5_5": {"color": "#B6C800", "marker": "^", "linestyle": "solid",
+                                  "label": r"$PA_{C\searrow}(\mathbf{x}^0_{max})$", "markersize": 10},
+    "pm_lb_init_2.5_2.5": {"color": "#b8c348", "marker": "^", "linestyle": linestyles["loosely dotted"],
+                                  "label": r"$PA_{C\searrow}(\mathbf{x}^0_{median})$", "markersize": 6},
+    "pm_lb_init_0_0": {"color": "#bec291", "marker": "^", "linestyle": linestyles["loosely dashed"],
+                             "label": r"$PA_{C\searrow}(\mathbf{x}^0_{min})$", "markersize": 6},
+    "pm_ub_init_5_5": {"color": "#f119c3", "marker": "v", "linestyle": "solid",
+                                  "label": r"$PA_{C\nearrow}(\mathbf{x}^0_{max})$", "markersize": 10},
+    "pm_ub_init_2.5_2.5": {"color": "#f190dd", "marker": "v", "linestyle": linestyles["loosely dotted"],
+                                  "label": r"$PA_{C\nearrow}(\mathbf{x}^0_{median})$", "markersize": 6},
+    "pm_ub_init_0_0": {"color": "#ecc0e3", "marker": "v", "linestyle": linestyles["loosely dashed"],
+                             "label": r"$PA_{C\nearrow}(\mathbf{x}^0_{min})$", "markersize": 6},
+    "ipdd_init_5_5": {"color": "#0d5915", "marker": "2", "linestyle": "solid",
+                                 "label": r"$IPDD(\mathbf{x}^0_{max})$",
+                                 "markersize": 10},
+    "ipdd_init_2.5_2.5": {"color": "#6ec977", "marker": "2", "linestyle": linestyles["loosely dotted"],
+                                 "label": r"$IPDD(\mathbf{x}^0_{median})$",
+                                 "markersize": 6},
+    "ipdd_init_0_0": {"color": "#96f6a0", "marker": "2", "linestyle": linestyles["loosely dashed"],
+                            "label": r"$IPDD(\mathbf{x}^0_{min})$",
+                            "markersize": 6},
+    "gdpa_init_5_5": {"color": "#E31D1D", "marker": "o", "linestyle": "solid",
+                                 "label": r"$GDPA(\mathbf{x}^0_{max})$",
+                                 "markersize": 10},
+    "gdpa_init_2.5_2.5": {"color": "#df6f67", "marker": "o", "linestyle": linestyles["loosely dotted"],
+                                 "label": r"$GDPA(\mathbf{x}^0_{median})$", "markersize": 6},
+    "gdpa_init_0_0": {"color": "#dea39f", "marker": "o", "linestyle": linestyles["loosely dashed"],
+                            "label": r"$GDPA(\mathbf{x}^0_{min})$", "markersize": 6},
+    "pga_init_5_5": {"color": "#1c24dc", "marker": "*", "linestyle": "solid",
+                                "label": r"$PGA(\mathbf{x}^0_{max})$",
+                                "markersize": 10},
+    "pga_init_2.5_2.5": {"color": "#595fdc", "marker": "*", "linestyle": linestyles["loosely dotted"],
+                                "label": r"$PGA(\mathbf{x}^0_{median})$", "markersize": 6},
+    "pga_init_0_0": {"color": "#9598dc", "marker": "*", "linestyle": linestyles["loosely dashed"],
+                           "label": r"$PGA(\mathbf{x}^0_{min})$", "markersize": 6}}
 
 
 def objective_value(num_con, T, opt_name, path, path_w, function_name, freq_s, lb_obj, ub_obj):
@@ -138,6 +138,7 @@ def objective_value(num_con, T, opt_name, path, path_w, function_name, freq_s, l
     plt.ylabel("Objective value", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("objective_value_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_" + function_name + ".eps"), format='eps')
     plt.show()
 
 
@@ -181,6 +182,7 @@ def constraint_violation(num_con, T, q, opt_name, path, path_w, function_name, f
     plt.ylabel("Constraint violation", fontsize=15)
     plt.grid()
     plt.savefig(path_w.joinpath("constraint_violations_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_" + function_name + ".eps"), format='eps')
     plt.show()
 
 
@@ -245,6 +247,7 @@ def objective_value_initialization(num_con, T, opt_name, path, path_w, function_
     plt.yticks(fontsize=14)
     plt.grid()
     plt.savefig(path_w.joinpath("objective_value_init_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_init_" + function_name + ".eps"), format='eps')
     plt.show()
 
 
@@ -290,6 +293,7 @@ def constraint_violation_initialization(num_con, T, opt_name, path, path_w, func
     plt.yticks(fontsize=14)
     plt.grid()
     plt.savefig(path_w.joinpath("constraint_violations_init_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_init_" + function_name + ".eps"), format='eps')
     plt.show()
 
 
@@ -349,6 +353,7 @@ def parameter_C(opt_names, T, Cs, path_r, path_w, function_name, lb_obj, ub_obj)
     plt.xlim([0, T])
     plt.grid()
     plt.savefig(path_w.joinpath("objective_value_parameter_C_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_parameter_C_" + function_name + ".eps"), format='eps')
     plt.show()
 
     plt.figure(figsize=(12, 6))
@@ -397,6 +402,7 @@ def parameter_C(opt_names, T, Cs, path_r, path_w, function_name, lb_obj, ub_obj)
     plt.xlim([0, T])
     plt.grid()
     plt.savefig(path_w.joinpath("constraint_violations_parameter_C_" + function_name + ".svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violations_parameter_C_" + function_name + ".eps"), format='eps')
     plt.show()
 
 
@@ -414,6 +420,7 @@ def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w, lb_obj, ub_obj):
     for beta in betas:
         filename = f"gdpa_beta_{beta}.json"
         filepath = path_r.joinpath(filename)
+        print(filepath)
         data = pd.read_json(filepath)
         freq_elem = int(len(data) / (T / freq_s))
         if freq_elem > 0:
@@ -438,6 +445,7 @@ def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w, lb_obj, ub_obj):
     plt.yticks(fontsize=14)
     plt.grid()
     plt.savefig(path_w.joinpath("objective_value_" + function + "_gdpa.svg"), format='svg')
+    plt.savefig(path_w.joinpath("objective_value_" + function + "_gdpa.eps"), format='eps')
     plt.show()
 
     plt.figure(figsize=(8, 6))
@@ -471,22 +479,21 @@ def evaluate_gdpa(T, function, betas, freq_s, path_r, path_w, lb_obj, ub_obj):
     plt.yticks(fontsize=14)
     plt.grid()
     plt.savefig(path_w.joinpath("constraint_violation_" + function + "_gdpa.svg"), format='svg')
+    plt.savefig(path_w.joinpath("constraint_violation_" + function + "_gdpa.eps"), format='eps')
     plt.show()
 
 
-if __name__ == "__main__":
-    function = "fun_3"
+def plot(function):
     lb_obj = PLOT_SPECS[function]["lb_obj"]
     ub_obj = PLOT_SPECS[function]["ub_obj"]
     freq_s = 20
-    path_read: Path = Path("../../data").joinpath(function)
-    path_write: Path = Path("../../plots").joinpath(function)
+    path_read: Path = Path("../data/linear").joinpath(function)
+    path_write: Path = Path("../plots/linear").joinpath(function)
     problem_spec = get_problem_spec(function)
     grad_spec = get_grad_spec(function)
     eval_spec = get_eval_spec(function)
     opt_name = ["mps", "pm_lb", "pm_ub", "ipdd", "gdpa", "pga"]
     # get_element_end_iteration(opt_name="pga", path=path_read, initial_solutions="")
-    """
     objective_value(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_name, path=path_read,
                     path_w=path_write, function_name=function,
                     freq_s=freq_s, lb_obj=lb_obj, ub_obj=ub_obj)
@@ -494,11 +501,10 @@ if __name__ == "__main__":
                          path=path_read,
                          path_w=path_write, function_name=function,
                          freq_s=freq_s)
-    """
     opt_names_init = form_optimizers_init_names(opt_names=opt_name,
                                                 opt_names_init=[],
-                                                initializations=[[25, 25, 25, 25, 25],
-                                                                 [10, 10, 10, 10, 10], [0, 0, 0, 0, 0]])
+                                                initializations=[[5, 5],
+                                                                 [2.5, 2.5], [0, 0]])
     objective_value_initialization(num_con=problem_spec["num_con"], T=problem_spec["T"], opt_name=opt_names_init,
                                    path=path_read.joinpath("initialization"), path_w=path_write, function_name=function,
                                    freq_s=freq_s, lb_obj=lb_obj, ub_obj=ub_obj)
@@ -507,13 +513,16 @@ if __name__ == "__main__":
                                         function_name=function,
                                         freq_s=freq_s)
 
-    """
     #get_element_end_iteration(opt_name="pm_ub", path=path_read.joinpath("initialization"),
     #                          initial_solutions=eval_spec["initial_vectors"])
     parameter_C(opt_names=["pm_lb", "pga"], T=problem_spec["T"], Cs=[1, 0.75, 0.5, 0.25, 0.1, 0.05],
                 path_r=path_read.joinpath("parameter_C"), path_w=path_write, function_name=function, lb_obj=lb_obj,
                 ub_obj=ub_obj)
     evaluate_gdpa(T=problem_spec["T"], function=function, betas=[0.9, 0.75, 0.5, 0.25, 0.1], freq_s=freq_s,
-                  path_r=Path("data").joinpath(function).joinpath("evaluate_gdpa"),
-                  path_w=Path("plots").joinpath(function), lb_obj=lb_obj, ub_obj=ub_obj)
-    """
+                  path_r=path_read.joinpath("evaluate_gdpa"),
+                  path_w=path_write, lb_obj=lb_obj, ub_obj=ub_obj)
+
+
+if __name__ == "__main__":
+    function = "fun_1"
+    plot(function=function)

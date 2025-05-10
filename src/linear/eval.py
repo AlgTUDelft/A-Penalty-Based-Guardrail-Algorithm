@@ -1,4 +1,5 @@
-from src.algorithms import *
+from src.linear.algorithms import *
+from src.helpers import *
 
 
 def initialization(problem_spec, grad_spec, initial_vectors, path):

@@ -1,6 +1,6 @@
 import numpy as np
 from src.nonlinear.algorithms_nonlinear import standard_penalty_alg, gdpa, pga
-from helpers import save
+from src.helpers import save
 
 
 def evaluate_gdpa(problem_spec, grad_spec, beta_inits, gammas, path):
