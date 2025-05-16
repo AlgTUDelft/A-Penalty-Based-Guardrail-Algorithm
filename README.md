@@ -16,4 +16,11 @@ We compare PGA against four well-known five algorithms:
 ## Evaluation Domains
 - Three linear evaluation domains,
 - Three nonlinear evaluation domains,
-- Real-world control of a district heating system domain. 
+- Real-world control of a district heating system domain.
+
+## Installation and Operation
+To install this package:
+```
+git clone 
+```
+
