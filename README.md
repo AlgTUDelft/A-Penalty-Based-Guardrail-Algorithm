@@ -16,11 +16,24 @@ We compare PGA against four well-known five algorithms:
 ## Evaluation Domains
 - Three linear evaluation domains,
 - Three nonlinear evaluation domains,
-- Real-world control of a district heating system domain.
+- Neural network-based control of a district heating system domain.
 
 ## Installation and Operation
 To install this package:
 ```
-git clone 
+git clone https://github.com/KStepanovic1/A-Penalty-Based-Guardrail-Algorithm.git
+cd /A-Penalty-Based-Guardrail-Algorithm
+pip install -r requirements.txt
 ```
-
+To run algorithms on linear domains:
+```
+python -m src.linear.algorithms_run.run
+```
+To run algorithms on nonlinear domains:
+```
+python -m src.nonlinear.algorithms_run.run
+```
+To run algorithm on the neural network-based control of a district heating system domain: 
+```
+python -m src.dnn.algorithms_run.run
+```
