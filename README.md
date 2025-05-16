@@ -27,13 +27,16 @@ pip install -r requirements.txt
 ```
 To run algorithms on linear domains:
 ```
+cd /path/to/A-Penalty-Based-Guardrail-Algorithm
 python -m src.linear.algorithms_run.run
 ```
 To run algorithms on nonlinear domains:
 ```
+cd /path/to/A-Penalty-Based-Guardrail-Algorithm
 python -m src.nonlinear.algorithms_run.run
 ```
 To run algorithm on the neural network-based control of a district heating system domain: 
 ```
+cd /path/to/A-Penalty-Based-Guardrail-Algorithm
 python -m src.dnn.algorithms_run.run
 ```
