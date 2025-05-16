@@ -21,7 +21,7 @@ We compare PGA against four well-known five algorithms:
 ## Installation and Operation
 To install this package:
 ```
-git clone https://github.com/KStepanovic1/A-Penalty-Based-Guardrail-Algorithm.git
+git clone https://github.com/AlgTUDelft/A-Penalty-Based-Guardrail-Algorithm.git
 cd /A-Penalty-Based-Guardrail-Algorithm
 pip install -r requirements.txt
 ```
