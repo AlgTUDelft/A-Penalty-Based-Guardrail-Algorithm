@@ -6,7 +6,7 @@ PGA adapts the traditional penalty-based algorithm -- which applies a low-streng
 on historical constraint values. This approach helps balance constraint violations and the minimization of the objective function. 
 
 ## Comparison Benchmarks
-We compare PGA against four well-known first-order algorithms:
+We compare PGA against four well-known five algorithms:
 - Standard penalty-based algorithm with a small value of the penalty parameter ($PA_{C \searrow}$),
 - Standard penalty-based algorithm with a large penalty parameter ($PA_{C \nearrow}$),
 - Increasing penalty dual decomposiion (IPDD) algorithm,
