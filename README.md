@@ -1,4 +1,4 @@
-# A Penalty-based Guardrail Algorithm
+# A Penalty-Based Guardrail Algorithm
 This repository presents the Penalty-Based Guardrail Algorithm (PGA) for solving large-scale, nonlinear, and nonconvex constrained minimization problems with increasing objective function and non-decreasing inequality constraints under tight time constraints. 
 
 ## Key Idea
